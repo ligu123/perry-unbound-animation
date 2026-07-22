@@ -328,20 +328,22 @@
     );
   }
 
-  const TRENDS = [
-    { label: '1× non-participating', pct: 64, hot: true },
-    { label: 'Participating, as-converted', pct: 22, hot: false },
-    { label: 'Multi-tranche waterfall', pct: 14, hot: false },
+  const PORTFOLIO_PREFS = [
+    { co: 'Orange Ltd', doc: 'Series A AoA', term: 'Participating, as-converted', hot: false },
+    { co: 'Grape Ltd', doc: 'Seed AoA', term: '1× non-participating', hot: true },
+    { co: 'Mango Ltd', doc: 'Series A AoA', term: 'Multi-tranche waterfall · 1.2×', hot: false },
   ];
-  const QUARTERS = [34, 41, 38, 52, 47, 61, 66, 78];
   function SPatterns() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
     const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
+    const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
     const phase = p < 0.22 ? 0 : p < 0.76 ? 1 : 2;
     const cardIn = ez(p, 0.23, 0.06);
+    const qIn = ez(p, 0.28, 0.06);
+    const ansIn = ez(p, 0.36, 0.07);
     const takeaway = ez(p, 0.62, 0.06);
     const cols = 22, rows = 3, total = cols * rows;
     const fillN = Math.floor(ez(p, 0.8, 0.12) * total);
@@ -358,36 +360,34 @@
                 <span style={{ flex: 1 }} />
                 <span style={{ ...mono, opacity: 0.55 }}>trailing 12 months · 14 companies</span>
               </div>
-              <div style={{ fontFamily: T, fontWeight: 600, fontSize: 34, color: pal.ink, marginBottom: 28 }}>Liquidation preference terms — new agreements</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 56 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-                  {TRENDS.map((tr, i) => {
-                    const e = ez(p, 0.3 + i * 0.05, 0.1);
+              <div style={{ background: pillBg, borderRadius: 999, padding: '18px 30px', fontFamily: M, fontSize: 22, color: pal.ink, opacity: qIn, transform: `translateY(${(1 - qIn) * 14}px)`, marginBottom: 28 }}>
+                What are the liquidation preferences across our portfolio?
+              </div>
+              <div style={{ opacity: ansIn, transform: `translateY(${(1 - ansIn) * 16}px)` }}>
+                <div style={{ fontFamily: T, fontWeight: 600, fontSize: 36, lineHeight: 1.25, color: pal.ink, maxWidth: 980, marginBottom: 28 }}>
+                  Mostly <span style={{ color: pal.accent }}>1× non-participating</span> — 12 of 14 portfolio companies. Two carry a 1.5× senior preference.
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
+                  {PORTFOLIO_PREFS.map((row, i) => {
+                    const e = ez(p, 0.44 + i * 0.045, 0.07);
                     return (
-                      <div key={tr.label} style={{ opacity: Math.min(1, e * 3) }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                          <span style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>{tr.label}</span>
-                          <span style={{ ...mono, color: tr.hot ? pal.accent : pal.ink, fontWeight: tr.hot ? 500 : 400 }}>{Math.round(tr.pct * e)}%</span>
+                      <div key={row.co} style={{ display: 'flex', alignItems: 'center', gap: 20, opacity: e, transform: `translateY(${(1 - e) * 12}px)`, padding: '14px 18px', borderRadius: 12, background: pal.dark ? 'rgba(242,239,232,0.05)' : 'rgba(16,18,21,0.035)' }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink }}>{row.co}</div>
+                          <div style={{ ...mono, fontSize: 15, opacity: 0.5, marginTop: 4 }}>{row.doc}</div>
                         </div>
-                        <div style={{ height: 16, borderRadius: 8, background: pal.dark ? 'rgba(242,239,232,0.08)' : 'rgba(16,18,21,0.06)' }}>
-                          <div style={{ height: 16, borderRadius: 8, width: `${tr.pct * e}%`, background: tr.hot ? pal.accent : (pal.dark ? 'rgba(242,239,232,0.4)' : 'rgba(16,18,21,0.35)') }} />
-                        </div>
+                        <div style={{ fontFamily: M, fontSize: 18, color: row.hot ? pal.accent : pal.ink, fontWeight: row.hot ? 500 : 400 }}>{row.term}</div>
                       </div>
                     );
                   })}
                 </div>
-                <div>
-                  <div style={{ ...mono, fontSize: 15, letterSpacing: '0.12em', opacity: 0.5, marginBottom: 14 }}>AGREEMENTS REVIEWED / QUARTER</div>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14, height: 150 }}>
-                    {QUARTERS.map((v, i) => {
-                      const e = ez(p, 0.42 + i * 0.02, 0.08);
-                      const hot = i === QUARTERS.length - 1;
-                      return <div key={i} style={{ flex: 1, height: `${(v / 78) * 100 * e}%`, borderRadius: '6px 6px 0 0', background: hot ? pal.accent : (pal.dark ? 'rgba(242,239,232,0.25)' : 'rgba(16,18,21,0.2)') }} />;
-                    })}
-                  </div>
+                <div style={{ display: 'flex', gap: 12, opacity: ez(p, 0.56, 0.05) }}>
+                  {['14 documents queried', '8 citations'].map((t) => (
+                    <span key={t} style={{ ...mono, fontSize: 15, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '7px 16px', opacity: 0.75 }}>{t}</span>
+                  ))}
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 34, opacity: takeaway, transform: `translateY(${(1 - takeaway) * 12}px)` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 30, opacity: takeaway, transform: `translateY(${(1 - takeaway) * 12}px)` }}>
                 <span style={{ width: 10, height: 10, borderRadius: 5, background: pal.accent }} />
                 <span style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink }}>1× non-participating is becoming your market standard — up 18% year-on-year.</span>
               </div>
