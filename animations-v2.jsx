@@ -745,12 +745,14 @@ function Stage({
     // engine's OWN clock — the hidden PlaybackBar glyph (and through it
     // the host's clock-reporter/adoption channel) reads that — and
     // SceneSwitch is the one consumer that widens to either.
+    // actualTime is the real playhead (ignores scrub-bar hover preview)
+    // so audio can free-run without seeking on every hover frame.
     () => ({
-      time: displayTime, duration, playing,
+      time: displayTime, actualTime: time, duration, playing,
       extPlaying: extPlay,
       setTime, setPlaying,
     }),
-    [displayTime, duration, playing, extPlay]
+    [displayTime, time, duration, playing, extPlay]
   );
 
   return (
@@ -1067,9 +1069,15 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
   start = +start || 0;
   volume = Math.max(0, Math.min(1, +volume || 0));
   if (typeof loop === 'string') loop = loop !== 'false';
-  const { time, playing, duration } = useTimeline();
+  // Prefer actualTime so scrub-bar hover preview doesn't thrash the audio.
+  const timeline = useTimeline();
+  const time = timeline.actualTime != null ? timeline.actualTime : timeline.time;
+  const playing = timeline.playing;
+  const duration = timeline.duration;
   const ref = React.useRef(null);
   const wantPlayRef = React.useRef(false);
+  const wasPlayingRef = React.useRef(false);
+  const lastTimeRef = React.useRef(time);
 
   React.useEffect(() => {
     const a = ref.current;
@@ -1086,9 +1094,20 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
     const capped = (a.duration && isFinite(a.duration))
       ? Math.min(target, Math.max(0, a.duration - 0.05))
       : target;
-    if (Math.abs(a.currentTime - capped) > 0.12) {
+    const drift = Math.abs(a.currentTime - capped);
+    // Discontinuous scrub / reset (not a normal rAF tick).
+    const jumped = Math.abs(time - lastTimeRef.current) > 0.3;
+    lastTimeRef.current = time;
+    const startedPlaying = playing && !wasPlayingRef.current;
+    wasPlayingRef.current = playing;
+
+    // MP3 seeks are audible — free-run while playing. Only hard-seek on
+    // pause/scrub, play-start, or rare large drift vs the stage clock.
+    const shouldSeek = !playing || startedPlaying || jumped || drift > 0.5;
+    if (shouldSeek && drift > 0.04) {
       try { a.currentTime = capped; } catch {}
     }
+
     wantPlayRef.current = playing && time < duration - 0.001;
     if (wantPlayRef.current) {
       if (a.paused) a.play().catch(() => {});
