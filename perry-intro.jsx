@@ -738,6 +738,17 @@
     );
   }
 
+  function SClose() {
+    const { progress: p } = useScene();
+    const pal = React.useContext(Pal);
+    return (
+      <div style={{ position: 'absolute', inset: 0, background: pal.paper, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <Slam p={p} at={0.08} size={72} color={pal.ink}>General legal AI completes a single task faster.</Slam>
+        <Slam p={p} at={0.28} size={88} color={pal.accent}>Perry runs the fund for you.</Slam>
+      </div>
+    );
+  }
+
   function SLogo() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
@@ -763,7 +774,7 @@
       <Pal.Provider value={pal}>
         <div style={{ position: 'fixed', inset: 0, background: pal.paper }}>
           <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="assets/a-little-higher.mp3" soundtrackStart={11} soundtrackVolume={0.85}>
-            {{ Hook: SHook, Ask: SAsk, NDA: SNda, Patterns: SPatterns, Tracked: STrack, Perry: SLogo }}
+            {{ Hook: SHook, Ask: SAsk, NDA: SNda, Patterns: SPatterns, Tracked: STrack, Close: SClose, Perry: SLogo }}
           </SceneStage>
         </div>
         <TweaksPanel>
