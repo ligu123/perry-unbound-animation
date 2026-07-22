@@ -1083,6 +1083,7 @@ function AudioSprite({ src, start = 0, delay = 0, volume = 1, loop = false }) {
   const wantPlayRef = React.useRef(false);
   const wasPlayingRef = React.useRef(false);
   const lastTimeRef = React.useRef(time);
+  const unlockedRef = React.useRef(false);
   const syncRef = React.useRef({ start, delay, time, playing, duration });
   syncRef.current = { start, delay, time, playing, duration };
 
@@ -1106,6 +1107,7 @@ function AudioSprite({ src, start = 0, delay = 0, volume = 1, loop = false }) {
     const a = ref.current;
     if (!a) return;
     // Force reload when the file changes (same path, new bytes / cache-bust).
+    unlockedRef.current = false;
     a.load();
   }, [src]);
 
@@ -1147,9 +1149,11 @@ function AudioSprite({ src, start = 0, delay = 0, volume = 1, loop = false }) {
     }
   }, [time, playing, start, delay, duration, tryPlay]);
 
-  // Browsers block autoplay-with-sound — unlock on the first gesture and
-  // sync to the current playhead. Audio is portaled to document.body
-  // because <audio> inside svg/foreignObject often cannot play.
+  // Browsers block autoplay-with-sound. On the first gesture, arm the
+  // element with a play()/pause() even during the delay window — otherwise
+  // play() after `delay` is treated as non-gesture and stays silent.
+  // Audio is portaled to document.body because <audio> inside
+  // svg/foreignObject often cannot play.
   React.useEffect(() => {
     const unlock = () => {
       const a = ref.current;
@@ -1164,7 +1168,17 @@ function AudioSprite({ src, start = 0, delay = 0, volume = 1, loop = false }) {
           a.currentTime = target;
         }
       } catch {}
-      if (s.playing && active) tryPlay();
+      a.muted = false;
+      a.volume = volume;
+      const p = a.play();
+      const after = () => {
+        unlockedRef.current = true;
+        if (!(s.playing && active)) {
+          try { a.pause(); } catch {}
+        }
+      };
+      if (p && p.then) p.then(after).catch(() => {});
+      else after();
     };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
@@ -1172,7 +1186,7 @@ function AudioSprite({ src, start = 0, delay = 0, volume = 1, loop = false }) {
       window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('keydown', unlock);
     };
-  }, [tryPlay]);
+  }, [volume]);
 
   const node = (
     <audio
