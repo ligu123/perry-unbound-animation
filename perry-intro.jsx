@@ -65,53 +65,15 @@
   function SHook() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
-    const phase = p < 0.36 ? 0 : p < 0.56 ? 1 : p < 0.79 ? 2 : 3;
-    const scatter = [
-      { t: 'Your deals live in the data room.', at: 0.04, top: '14%', left: 130, rot: -2.6, size: 80, icon: 'folder' },
-      { t: 'Your obligations live in inboxes.', at: 0.16, top: '41%', left: 520, rot: 2.2, size: 70, icon: 'mail' },
-      { t: 'Your answers live in someone\u2019s head.', at: 0.28, top: '66%', left: 210, rot: -1.5, size: 76, icon: 'head' },
-    ];
-    const iconBg = pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)';
-    const icons = {
-      folder: <svg width="24" height="20" viewBox="0 0 24 20"><path d="M1.5 3 H9 l2.4 3 H22.5 V18.5 H1.5 Z" fill="none" stroke={pal.ink} strokeWidth="1.7" strokeLinejoin="round" /></svg>,
-      mail: <svg width="24" height="19" viewBox="0 0 22 18"><rect x="1" y="1" width="20" height="16" rx="2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" /><polyline points="1.5,2.5 11,10 20.5,2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" strokeLinejoin="round" /></svg>,
-      head: <svg width="22" height="24" viewBox="0 0 22 24"><circle cx="11" cy="7" r="5.2" fill="none" stroke={pal.ink} strokeWidth="1.7" /><path d="M2 23 C2 17.5 6 15 11 15 C16 15 20 17.5 20 23" fill="none" stroke={pal.ink} strokeWidth="1.7" strokeLinecap="round" /></svg>,
-    };
+    const logo = ez(p, 0.04, 0.12);
+    const logoPop = ez(p, 0.04, 0.18, Easing.easeOutBack);
+    const rule = ez(p, 0.22, 0.1);
+    const line = ez(p, 0.32, 0.1);
     return (
-      <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
-        {phase === 0 && (
-          <div style={{ position: 'absolute', inset: 0 }}>
-            {scatter.map((s) => {
-              const e = ez(p, s.at, 0.07);
-              return (
-                <div key={s.t} style={{ position: 'absolute', top: s.top, left: s.left, transform: `rotate(${s.rot}deg)`, display: 'flex', alignItems: 'center', gap: 26 }}>
-                  <span style={{ width: 64, height: 64, borderRadius: 32, flexShrink: 0, background: iconBg, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', opacity: e, transform: `scale(${0.6 + 0.4 * e}) rotate(${-s.rot * 2}deg)` }}>{icons[s.icon]}</span>
-                  <Slam p={p} at={s.at} size={s.size} color={pal.ink}>{s.t}</Slam>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {phase === 1 && (
-          <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.38} size={128} color={pal.ink}>More deals. More documents.</Slam>
-            <Slam p={p} at={0.44} size={128} color={pal.accent}>More slipping through.</Slam>
-          </div>
-        )}
-        {phase === 2 && (
-          <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.58} size={168} color={pal.ink}>There’s no system</Slam>
-            <Slam p={p} at={0.615} size={168} color={pal.ink}>underneath.</Slam>
-            <div style={{ marginTop: 44, fontFamily: M, fontSize: 30, color: pal.ink, opacity: ez(p, 0.66, 0.06) * 0.7 }}>just people, holding it together.</div>
-          </div>
-        )}
-        {phase === 3 && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <img src="assets/perry-logo.png" alt="Perry" style={{ width: 620, opacity: ez(p, 0.81, 0.06), transform: `scale(${0.85 + 0.15 * ez(p, 0.81, 0.09, Easing.easeOutBack)})`, filter: pal.dark ? 'invert(1)' : 'none' }} />
-            <div style={{ height: 4, width: 460 * ez(p, 0.88, 0.05), background: pal.accent, borderRadius: 2, margin: '46px 0 34px' }} />
-            <div style={{ fontFamily: T, fontWeight: 600, fontSize: 54, color: pal.accent, opacity: ez(p, 0.9, 0.05), transform: `translateY(${(1 - ez(p, 0.9, 0.05)) * 14}px)` }}>Meet the legal OS.</div>
-          </div>
-        )}
+      <div style={{ position: 'absolute', inset: 0, background: pal.paper, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <img src="assets/perry-logo.png" alt="Perry" style={{ width: 620, opacity: logo, transform: `scale(${0.85 + 0.15 * logoPop})`, filter: pal.dark ? 'invert(1)' : 'none' }} />
+        <div style={{ height: 4, width: 460 * rule, background: pal.accent, borderRadius: 2, margin: '46px 0 34px' }} />
+        <div style={{ fontFamily: T, fontWeight: 600, fontSize: 54, color: pal.accent, opacity: line, transform: `translateY(${(1 - line) * 14}px)` }}>Meet the legal OS.</div>
       </div>
     );
   }
@@ -628,7 +590,7 @@
     return (
       <Pal.Provider value={pal}>
         <div style={{ position: 'fixed', inset: 0, background: pal.paper }}>
-          <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="assets/a-little-higher.mp3" soundtrackVolume={0.85}>
+          <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="assets/a-little-higher.mp3" soundtrackStart={11} soundtrackVolume={0.85}>
             {{ Hook: SHook, Ask: SAsk, NDA: SNda, Patterns: SPatterns, Tracked: STrack, Perry: SLogo }}
           </SceneStage>
         </div>

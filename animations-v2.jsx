@@ -1562,7 +1562,11 @@ function SceneStage(props) {
         <PlaybackSync raw={praw} onUpdate={setPraw} />
       )}
       {typeof soundtrack === 'string' && soundtrack !== '' && (
-        <AudioSprite src={soundtrack} volume={props.soundtrackVolume == null ? 0.85 : props.soundtrackVolume} />
+        <AudioSprite
+          src={soundtrack}
+          start={props.soundtrackStart == null ? 0 : +props.soundtrackStart || 0}
+          volume={props.soundtrackVolume == null ? 0.85 : props.soundtrackVolume}
+        />
       )}
       <SceneSwitch scenes={scenes} map={props.children} transition={transition}
                    loop={loopEff} />
