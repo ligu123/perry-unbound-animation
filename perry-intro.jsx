@@ -387,8 +387,8 @@
         )}
         {phase === 3 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.82} size={122} color={pal.ink}>Reviewed before</Slam>
-            <Slam p={p} at={0.835} size={122} color={pal.accent}>you’ve opened the email.</Slam>
+            <Slam p={p} at={0.82} size={122} color={pal.ink}>Forward it once.</Slam>
+            <Slam p={p} at={0.835} size={122} color={pal.accent}>Get the redline back.</Slam>
             <div style={{ marginTop: 56 }}>
               <KpiFlip p={p} at={0.865} label="NDA review" from="30 min" to="7 min" />
             </div>
