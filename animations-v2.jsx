@@ -1066,8 +1066,10 @@ function VideoSprite({ src, start = 0, end, speed = 1, style, ...rest }) {
 //   <AudioSprite src="assets/score.mp3" start={0} volume={0.85} />
 
 function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
-  start = +start || 0;
-  volume = Math.max(0, Math.min(1, +volume || 0));
+  start = Number(start);
+  if (!isFinite(start) || start < 0) start = 0;
+  const volN = Number(volume);
+  volume = isFinite(volN) ? Math.max(0, Math.min(1, volN)) : 0.85;
   if (typeof loop === 'string') loop = loop !== 'false';
   // Prefer actualTime so scrub-bar hover preview doesn't thrash the audio.
   const timeline = useTimeline();
@@ -1078,6 +1080,7 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
   const wantPlayRef = React.useRef(false);
   const wasPlayingRef = React.useRef(false);
   const lastTimeRef = React.useRef(time);
+  const readyRef = React.useRef(false);
 
   React.useEffect(() => {
     const a = ref.current;
@@ -1089,12 +1092,27 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
   React.useEffect(() => {
     const a = ref.current;
     if (!a) return;
+    const onReady = () => { readyRef.current = true; };
+    a.addEventListener('loadedmetadata', onReady);
+    a.addEventListener('canplay', onReady);
+    if (a.readyState >= 1) readyRef.current = true;
+    return () => {
+      a.removeEventListener('loadedmetadata', onReady);
+      a.removeEventListener('canplay', onReady);
+    };
+  }, [src]);
+
+  React.useEffect(() => {
+    const a = ref.current;
+    if (!a) return;
+    const mediaDur = (a.duration && isFinite(a.duration)) ? a.duration : null;
     const target = Math.max(0, start + time);
-    // Don't seek past media duration once metadata is known.
-    const capped = (a.duration && isFinite(a.duration))
-      ? Math.min(target, Math.max(0, a.duration - 0.05))
+    // Past the end of the track — keep paused at the tail; don't restart.
+    const pastEnd = mediaDur != null && target >= mediaDur - 0.03;
+    const capped = mediaDur != null
+      ? Math.min(target, Math.max(0, mediaDur - 0.05))
       : target;
-    const drift = Math.abs(a.currentTime - capped);
+    const drift = Math.abs((a.currentTime || 0) - capped);
     // Discontinuous scrub / reset (not a normal rAF tick).
     const jumped = Math.abs(time - lastTimeRef.current) > 0.3;
     lastTimeRef.current = time;
@@ -1102,15 +1120,19 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
     wasPlayingRef.current = playing;
 
     // MP3 seeks are audible — free-run while playing. Only hard-seek on
-    // pause/scrub, play-start, or rare large drift vs the stage clock.
-    const shouldSeek = !playing || startedPlaying || jumped || drift > 0.5;
-    if (shouldSeek && drift > 0.04) {
+    // pause/scrub, play-start, ended-restart, or rare large drift.
+    const needsRestart = a.ended || (pastEnd === false && a.currentTime > capped + 1);
+    const shouldSeek = !playing || startedPlaying || jumped || needsRestart || drift > 0.5;
+    if (shouldSeek && drift > 0.03) {
       try { a.currentTime = capped; } catch {}
     }
 
-    wantPlayRef.current = playing && time < duration - 0.001;
+    wantPlayRef.current = playing && !pastEnd && time < duration - 0.001;
     if (wantPlayRef.current) {
-      if (a.paused) a.play().catch(() => {});
+      if (a.paused || a.ended) {
+        const p = a.play();
+        if (p && p.catch) p.catch(() => {});
+      }
     } else if (!a.paused) {
       a.pause();
     }
@@ -1121,7 +1143,9 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
     const unlock = () => {
       const a = ref.current;
       if (!a || !wantPlayRef.current) return;
-      if (a.paused) a.play().catch(() => {});
+      a.muted = false;
+      const p = a.play();
+      if (p && p.catch) p.catch(() => {});
     };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
@@ -1134,6 +1158,7 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
   return (
     <audio
       ref={ref}
+      key={src}
       src={src}
       preload="auto"
       playsInline
@@ -1564,8 +1589,8 @@ function SceneStage(props) {
       {typeof soundtrack === 'string' && soundtrack !== '' && (
         <AudioSprite
           src={soundtrack}
-          start={props.soundtrackStart == null ? 0 : +props.soundtrackStart || 0}
-          volume={props.soundtrackVolume == null ? 0.85 : props.soundtrackVolume}
+          start={props.soundtrackStart == null || props.soundtrackStart === '' ? 0 : Number(props.soundtrackStart)}
+          volume={props.soundtrackVolume == null || props.soundtrackVolume === '' ? 0.85 : Number(props.soundtrackVolume)}
         />
       )}
       <SceneSwitch scenes={scenes} map={props.children} transition={transition}
