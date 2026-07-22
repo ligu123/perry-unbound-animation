@@ -1063,11 +1063,14 @@ function VideoSprite({ src, start = 0, end, speed = 1, style, ...rest }) {
 // the first play/click unlocks it.
 //
 //   <AudioSprite src="assets/score.mp3" />
-//   <AudioSprite src="assets/score.mp3" start={0} volume={0.85} />
+//   <AudioSprite src="assets/score.mp3" start={0} delay={1} volume={0.85} />
+//   delay = seconds of timeline silence before the track begins at `start`.
 
-function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
+function AudioSprite({ src, start = 0, delay = 0, volume = 1, loop = false }) {
   start = Number(start);
   if (!isFinite(start) || start < 0) start = 0;
+  delay = Number(delay);
+  if (!isFinite(delay) || delay < 0) delay = 0;
   const volN = Number(volume);
   volume = isFinite(volN) ? Math.max(0, Math.min(1, volN)) : 0.85;
   if (typeof loop === 'string') loop = loop !== 'false';
@@ -1080,8 +1083,8 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
   const wantPlayRef = React.useRef(false);
   const wasPlayingRef = React.useRef(false);
   const lastTimeRef = React.useRef(time);
-  const syncRef = React.useRef({ start, time, playing, duration });
-  syncRef.current = { start, time, playing, duration };
+  const syncRef = React.useRef({ start, delay, time, playing, duration });
+  syncRef.current = { start, delay, time, playing, duration };
 
   const tryPlay = React.useCallback(() => {
     const a = ref.current;
@@ -1110,34 +1113,39 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
     const a = ref.current;
     if (!a) return;
     const mediaDur = (a.duration && isFinite(a.duration)) ? a.duration : null;
-    const target = Math.max(0, start + time);
+    // delay: stay silent until the playhead reaches `delay`, then map
+    // timeline (time - delay) onto the track starting at `start`.
+    const active = time >= delay;
+    const target = active ? Math.max(0, start + (time - delay)) : start;
     // Past the end of the track — keep paused at the tail; don't restart.
-    const pastEnd = mediaDur != null && target >= mediaDur - 0.03;
+    const pastEnd = active && mediaDur != null && target >= mediaDur - 0.03;
     const capped = mediaDur != null
       ? Math.min(target, Math.max(0, mediaDur - 0.05))
       : target;
     const drift = Math.abs((a.currentTime || 0) - capped);
     // Discontinuous scrub / reset (not a normal rAF tick).
     const jumped = Math.abs(time - lastTimeRef.current) > 0.3;
+    const wasActive = lastTimeRef.current >= delay;
     lastTimeRef.current = time;
     const startedPlaying = playing && !wasPlayingRef.current;
     wasPlayingRef.current = playing;
+    const justEntered = active && !wasActive;
 
     // MP3 seeks are audible — free-run while playing. Only hard-seek on
-    // pause/scrub, play-start, ended-restart, or rare large drift.
-    const needsRestart = a.ended || (pastEnd === false && a.currentTime > capped + 1);
-    const shouldSeek = !playing || startedPlaying || jumped || needsRestart || drift > 0.5;
-    if (shouldSeek && (drift > 0.03 || needsRestart || a.ended)) {
+    // pause/scrub, play-start, delay-entry, ended-restart, or large drift.
+    const needsRestart = a.ended || (pastEnd === false && active && a.currentTime > capped + 1);
+    const shouldSeek = !playing || !active || startedPlaying || jumped || justEntered || needsRestart || drift > 0.5;
+    if (shouldSeek && (drift > 0.03 || needsRestart || a.ended || !active || justEntered)) {
       try { a.currentTime = capped; } catch {}
     }
 
-    wantPlayRef.current = playing && !pastEnd && time < duration - 0.001;
+    wantPlayRef.current = playing && active && !pastEnd && time < duration - 0.001;
     if (wantPlayRef.current) {
       if (a.paused || a.ended) tryPlay();
     } else if (!a.paused) {
       a.pause();
     }
-  }, [time, playing, start, duration, tryPlay]);
+  }, [time, playing, start, delay, duration, tryPlay]);
 
   // Browsers block autoplay-with-sound — unlock on the first gesture and
   // sync to the current playhead. Audio is portaled to document.body
@@ -1147,7 +1155,8 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
       const a = ref.current;
       if (!a) return;
       const s = syncRef.current;
-      const target = Math.max(0, s.start + s.time);
+      const active = s.time >= s.delay;
+      const target = active ? Math.max(0, s.start + (s.time - s.delay)) : s.start;
       try {
         if (isFinite(a.duration) && a.duration > 0) {
           a.currentTime = Math.min(target, Math.max(0, a.duration - 0.05));
@@ -1155,7 +1164,7 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
           a.currentTime = target;
         }
       } catch {}
-      if (s.playing) tryPlay();
+      if (s.playing && active) tryPlay();
     };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
@@ -1603,6 +1612,7 @@ function SceneStage(props) {
         <AudioSprite
           src={soundtrack}
           start={props.soundtrackStart == null || props.soundtrackStart === '' ? 0 : Number(props.soundtrackStart)}
+          delay={props.soundtrackDelay == null || props.soundtrackDelay === '' ? 0 : Number(props.soundtrackDelay)}
           volume={props.soundtrackVolume == null || props.soundtrackVolume === '' ? 0.85 : Number(props.soundtrackVolume)}
         />
       )}
