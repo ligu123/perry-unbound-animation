@@ -487,11 +487,153 @@
   }
 
   const TASKS = [
-    { t: 'Collect signed IP assignment', c: 'Mango Ltd', o: 'External counsel', d: '01 Aug', s0: 'Awaiting signature', done: 0.5 },
-    { t: 'File SH01 \u2014 share allotment', c: 'Orange Ltd', o: 'J. Whitfield', d: '08 Aug', s0: 'In progress', done: 0.6 },
-    { t: 'Board consent \u2014 ESOP top-up', c: 'Grape Ltd', o: 'External counsel', d: '15 Aug', s0: 'Waiting on counterparty', done: null },
-    { t: 'Update cap table post-closing', c: 'Orange Ltd', o: 'M. Osei', d: '22 Aug', s0: 'Not started', done: null },
+    { t: 'Collect signed IP assignment', c: 'Grape Ltd', o: 'External counsel', d: '01 Aug', s0: 'Awaiting signature' },
+    { t: 'File SH01 \u2014 share allotment', c: 'Grape Ltd', o: 'J. Whitfield', d: '08 Aug', s0: 'In progress' },
+    { t: 'Board consent \u2014 ESOP top-up', c: 'Grape Ltd', o: 'External counsel', d: '15 Aug', s0: 'Waiting on counterparty', focus: true },
+    { t: 'Update cap table post-closing', c: 'Grape Ltd', o: 'M. Osei', d: '22 Aug', s0: 'Not started' },
   ];
+  const PACK_FILES = [
+    'SPA_executed.pdf',
+    'SHA_final.pdf',
+    'Disclosure_letter.pdf',
+    'Ancillary_docs.zip',
+  ];
+
+  function TrackChat({ p }) {
+    const pal = React.useContext(Pal);
+    const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
+    const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
+    const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
+    const soft = pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.06)';
+    const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
+    const cardIn = ez(p, 0.02, 0.08);
+    const packIn = ez(p, 0.12, 0.08);
+    const msgIn = ez(p, 0.28, 0.07);
+    const searchIn = ez(p, 0.4, 0.06);
+    const ansIn = ez(p, 0.5, 0.07);
+    return (
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 1120, height: 660, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${0.96 + 0.04 * cardIn})`, overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '32px 48px 18px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: `1px solid ${cardBorder}`, flexShrink: 0 }}>
+            <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
+            <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>ASSISTANT</span>
+            <span style={{ flex: 1 }} />
+            <span style={{ fontFamily: M, fontSize: 15, color: pal.ink, opacity: 0.45 }}>Grape Ltd · Series A close</span>
+          </div>
+          <div style={{ flex: 1, overflow: 'hidden', padding: '28px 48px 32px', position: 'relative' }}>
+            <div style={{
+              border: `1.5px dashed ${pal.accent}`, borderRadius: 16, padding: '22px 26px', background: pal.dark ? 'rgba(0,156,127,0.08)' : 'rgba(0,156,127,0.05)',
+              opacity: packIn, transform: `translateY(${(1 - packIn) * 18}px)`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+                <span style={{ width: 44, height: 44, borderRadius: 12, background: soft, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="22" height="20" viewBox="0 0 24 20"><path d="M1.5 3 H9 l2.4 3 H22.5 V18.5 H1.5 Z" fill="none" stroke={pal.ink} strokeWidth="1.7" strokeLinejoin="round" /></svg>
+                </span>
+                <div>
+                  <div style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>Grape_Ltd_Closing_Pack.zip</div>
+                  <div style={{ ...mono, fontSize: 14, opacity: 0.5, marginTop: 3 }}>Transaction document package · 4 files</div>
+                </div>
+                <span style={{ marginLeft: 'auto', fontFamily: M, fontSize: 14, color: pal.accent, fontWeight: 500 }}>Uploaded</span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {PACK_FILES.map((f, i) => {
+                  const e = ez(p, 0.16 + i * 0.03, 0.05);
+                  return (
+                    <span key={f} style={{ ...mono, fontSize: 14, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '6px 14px', background: cardBg, opacity: e, transform: `translateY(${(1 - e) * 8}px)` }}>{f}</span>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ background: pillBg, borderRadius: 999, padding: '16px 28px', fontFamily: M, fontSize: 20, color: pal.ink, marginTop: 22, opacity: msgIn, transform: `translateY(${(1 - msgIn) * 14}px)` }}>
+              Create a post-close task list from this closing pack
+            </div>
+
+            <div style={{ opacity: ansIn, transform: `translateY(${(1 - ansIn) * 16}px)` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '22px 0 14px', fontFamily: M, fontSize: 16, color: pal.ink, opacity: 0.55 * searchIn }}>
+                <span style={{ width: 13, height: 16, border: `1.5px solid ${pal.ink}`, borderRadius: 3, display: 'inline-block' }} />
+                Extracted obligations from closing pack
+              </div>
+              <div style={{ fontFamily: F, fontWeight: 400, fontSize: 21, lineHeight: 1.45, color: pal.ink, marginBottom: 18 }}>
+                Created <strong style={{ color: pal.accent }}>4 post-close tasks</strong> for Grape Ltd:
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {TASKS.map((task, i) => {
+                  const e = ez(p, 0.58 + i * 0.07, 0.06);
+                  return (
+                    <div key={task.t} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', borderRadius: 12, background: pillBg, opacity: e, transform: `translateY(${(1 - e) * 12}px)` }}>
+                      <Check on={e > 0.55} accent={pal.accent} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>{task.t}</div>
+                        <div style={{ ...mono, fontSize: 13, opacity: 0.5, marginTop: 3 }}>Due {task.d} · {task.o}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function TaskList({ p }) {
+    const pal = React.useContext(Pal);
+    const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
+    const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
+    const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
+    const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
+    const cardIn = ez(p, 0.02, 0.08);
+    const focusIdx = 2;
+    const clickAt = 0.55;
+    const hover = ez(p, clickAt - 0.12, 0.08);
+    const press = Math.sin(Math.PI * clamp((p - clickAt) / 0.06, 0, 1));
+    const curO = Math.min(ez(p, 0.35, 0.06), 1 - ez(p, clickAt + 0.08, 0.05));
+    const curX = 420 + 40 * (1 - hover);
+    const curY = 318 + focusIdx * 62 + 20 * (1 - hover);
+    return (
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 1180, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 40px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${0.96 + 0.04 * cardIn})`, position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
+            <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>TASKS</span>
+            <span style={{ flex: 1 }} />
+            <span style={{ ...mono, opacity: 0.6 }}>4 open · from closing pack</span>
+            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.dark ? '#141310' : '#fafafa', background: pal.dark ? '#f2efe8' : '#18181b', borderRadius: 999, padding: '10px 22px' }}>+ New task</span>
+          </div>
+          <div style={{ ...mono, background: pillBg, borderRadius: 999, padding: '12px 24px', margin: '24px 0 8px', opacity: 0.55 }}>Search tasks…</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 130px 170px 90px 220px', gap: 14, padding: '14px 8px 10px', borderBottom: `1px solid ${cardBorder}`, fontFamily: M, fontSize: 15, letterSpacing: '0.1em', color: pal.ink, opacity: 0.5 }}>
+            <span>TASK</span><span>COMPANY</span><span>OWNER</span><span>DUE</span><span>STATUS</span>
+          </div>
+          {TASKS.map((task, i) => {
+            const e = ez(p, 0.12 + i * 0.06, 0.06);
+            const isFocus = i === focusIdx && p >= clickAt - 0.1;
+            const hl = isFocus ? Math.max(hover, press) : 0;
+            return (
+              <div key={i} style={{
+                display: 'grid', gridTemplateColumns: '1fr 130px 170px 90px 220px', gap: 14, alignItems: 'center',
+                padding: '16px 8px', borderBottom: i < 3 ? `1px solid ${cardBorder}` : 'none',
+                opacity: e, transform: `translateY(${(1 - e) * 16}px) scale(${1 - 0.015 * press * (i === focusIdx ? 1 : 0)})`,
+                background: hl > 0.2 ? pillBg : 'transparent', borderRadius: 10,
+                boxShadow: i === focusIdx && press > 0.2 ? `inset 0 0 0 1.5px ${pal.accent}` : 'none',
+              }}>
+                <span style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>{task.t}</span>
+                <span style={{ ...mono, opacity: 0.75 }}>{task.c}</span>
+                <span style={{ ...mono, opacity: 0.75 }}>{task.o}</span>
+                <span style={{ ...mono, opacity: 0.75 }}>{task.d}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, justifySelf: 'start', fontFamily: M, fontSize: 15, borderRadius: 999, padding: '6px 14px', color: pal.ink, background: pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)' }}>
+                  {task.s0}
+                </span>
+              </div>
+            );
+          })}
+          <Cursor x={curX} y={curY} opacity={curO} />
+        </div>
+      </div>
+    );
+  }
+
   function TaskDetail({ p }) {
     const pal = React.useContext(Pal);
     const { localTime } = useScene();
@@ -499,17 +641,17 @@
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
-    const cardIn = ez(p, 0.14, 0.05);
+    const cardIn = ez(p, 0.02, 0.08);
     const TYPE1 = '@El';
-    const n1 = Math.round(clamp((p - 0.19) / 0.04, 0, 1) * TYPE1.length);
-    const dropVis = Math.min(ez(p, 0.22, 0.04), 1 - ez(p, 0.285, 0.03));
-    const mentioned = p >= 0.295;
+    const n1 = Math.round(clamp((p - 0.18) / 0.06, 0, 1) * TYPE1.length);
+    const dropVis = Math.min(ez(p, 0.24, 0.05), 1 - ez(p, 0.38, 0.04));
+    const mentioned = p >= 0.4;
     const REST = ' could you circulate the board consent for signature this week?';
-    const restIn = ez(p, 0.31, 0.05);
-    const posted = p >= 0.42;
-    const notified = ez(p, 0.45, 0.04);
-    const caret = !posted && p >= 0.17 && Math.floor(localTime * 2.5) % 2 === 0;
-    const press = 1 - 0.08 * Math.sin(Math.PI * clamp((p - 0.405) / 0.025, 0, 1));
+    const restIn = ez(p, 0.42, 0.06);
+    const posted = p >= 0.62;
+    const notified = ez(p, 0.68, 0.05);
+    const caret = !posted && p >= 0.14 && Math.floor(localTime * 2.5) % 2 === 0;
+    const press = 1 - 0.08 * Math.sin(Math.PI * clamp((p - 0.58) / 0.04, 0, 1));
     const mentionChip = (
       <span style={{ color: pal.accent, fontWeight: 600, background: pal.dark ? 'rgba(0,156,127,0.18)' : 'rgba(0,156,127,0.1)', borderRadius: 6, padding: '1px 6px' }}>@Elena Ruiz</span>
     );
@@ -572,63 +714,23 @@
   function STrack() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
-    const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
-    const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
-    const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
-    const phase = p < 0.13 ? 0 : p < 0.6 ? 1 : p < 0.78 ? 2 : 3;
-    const cardIn = ez(p, 0.61, 0.05);
-    const doneCount = (p >= 0.65 ? 1 : 0) + (p >= 0.74 ? 1 : 0);
-    const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
+    // 0 hook · 1 chat upload+tasks · 2 task list click · 3 @mention detail · 4 payoff
+    const phase = p < 0.1 ? 0 : p < 0.4 ? 1 : p < 0.55 ? 2 : p < 0.8 ? 3 : 4;
+    const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
         {phase === 0 ? <SectionTitle p={p} num="04" text="POST-CLOSE TRACKING" /> : <Kicker p={p} at={0} num="04" text="POST-CLOSE TRACKING" />}
         {phase === 0 && <HookLines p={p} size={124} l1="The deal closed." l2="The work didn't." />}
-        {phase === 1 && <TaskDetail p={p} />}
-        {phase === 2 && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: 1180, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 40px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${0.96 + 0.04 * cardIn})` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
-                <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>TASKS</span>
-                <span style={{ flex: 1 }} />
-                <span style={{ ...mono, opacity: 0.6 }}>{doneCount} of 4 complete</span>
-                <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.dark ? '#141310' : '#fafafa', background: pal.dark ? '#f2efe8' : '#18181b', borderRadius: 999, padding: '10px 22px' }}>+ New task</span>
-              </div>
-              <div style={{ ...mono, background: pillBg, borderRadius: 999, padding: '12px 24px', margin: '24px 0 8px', opacity: 0.55 }}>Search tasks…</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 130px 170px 90px 220px', gap: 14, padding: '14px 8px 10px', borderBottom: `1px solid ${cardBorder}`, fontFamily: M, fontSize: 15, letterSpacing: '0.1em', color: pal.ink, opacity: 0.5 }}>
-                <span>TASK</span><span>COMPANY</span><span>OWNER</span><span>DUE</span><span>STATUS</span>
-              </div>
-              {TASKS.map((task, i) => {
-                const e = ez(p, 0.63 + i * 0.03, 0.05);
-                const dn = task.done ? ez(p, task.done + 0.12, 0.04) : 0;
-                const isDone = dn > 0.5;
-                const hl = 0;
-                return (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 130px 170px 90px 220px', gap: 14, alignItems: 'center', padding: '16px 8px', borderBottom: i < 3 ? `1px solid ${cardBorder}` : 'none', opacity: e, transform: `translateY(${(1 - e) * 16}px)`, background: hl ? pillBg : 'transparent', borderRadius: 10 }}>
-                    <span style={{ position: 'relative', fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink, opacity: isDone ? 0.5 : 1 }}>
-                      {task.t}
-                      <span style={{ position: 'absolute', left: 0, top: '52%', height: 2.5, width: `${dn * 100}%`, background: pal.accent }} />
-                    </span>
-                    <span style={{ ...mono, opacity: 0.75 }}>{task.c}</span>
-                    <span style={{ ...mono, opacity: 0.75 }}>{task.o}</span>
-                    <span style={{ ...mono, opacity: 0.75 }}>{task.d}</span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, justifySelf: 'start', fontFamily: M, fontSize: 15, borderRadius: 999, padding: '6px 14px', color: isDone ? '#fff' : pal.ink, background: isDone ? pal.accent : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)'), transform: `scale(${task.done ? 1 + 0.12 * Math.sin(Math.PI * dn) : 1})` }}>
-                      {isDone && <svg width="11" height="9" viewBox="0 0 13 11"><polyline points="1.5,5.5 5,9 11.5,1.5" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-                      {isDone ? 'Done' : task.s0}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-        {phase === 3 && (
+        {phase === 1 && <TrackChat p={local(0.1, 0.4)} />}
+        {phase === 2 && <TaskList p={local(0.4, 0.55)} />}
+        {phase === 3 && <TaskDetail p={local(0.55, 0.8)} />}
+        {phase === 4 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.775} size={98} color={pal.ink}>Every obligation — an owner,</Slam>
-            <Slam p={p} at={0.795} size={98} color={pal.ink}>a deadline, a paper trail.</Slam>
-            <Slam p={p} at={0.815} size={132} color={pal.accent}>Nothing slips.</Slam>
+            <Slam p={p} at={0.82} size={98} color={pal.ink}>Every obligation — an owner,</Slam>
+            <Slam p={p} at={0.84} size={98} color={pal.ink}>a deadline, a paper trail.</Slam>
+            <Slam p={p} at={0.86} size={132} color={pal.accent}>Nothing slips.</Slam>
             <div style={{ marginTop: 44 }}>
-              <KpiFlip p={p} at={0.825} label="Post-investment follow-up" from="Email chains" to="Shared tracking" />
+              <KpiFlip p={p} at={0.875} label="Post-investment follow-up" from="Email chains" to="Shared tracking" />
             </div>
           </div>
         )}
