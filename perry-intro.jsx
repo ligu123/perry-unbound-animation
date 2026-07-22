@@ -743,8 +743,8 @@
     const pal = React.useContext(Pal);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <Slam p={p} at={0.06} size={72} color={pal.ink}>General legal AI completes a single task faster.</Slam>
-        <Slam p={p} at={0.16} size={88} color={pal.accent}>Perry runs the fund for you.</Slam>
+        <Slam p={p} at={0.05} size={72} color={pal.ink}>General legal AI completes a single task faster.</Slam>
+        <Slam p={p} at={0.14} size={88} color={pal.accent}>Perry runs the fund for you.</Slam>
       </div>
     );
   }
