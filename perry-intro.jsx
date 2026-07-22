@@ -240,49 +240,114 @@
     const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
-    const phase = p < 0.17 ? 0 : p < 0.44 ? 1 : p < 0.74 ? 2 : 3;
-    const cardIn = ez(p, 0.18, 0.05);
-    const mailIn = ez(p, 0.22, 0.05);
-    const s1 = ez(p, 0.29, 0.05);
-    const s2 = ez(p, 0.36, 0.05);
-    const docIn = ez(p, 0.45, 0.06);
-    const strike1 = ez(p, 0.51, 0.05);
-    const strike2 = ez(p, 0.565, 0.05);
-    const s3 = ez(p, 0.62, 0.05);
-    const mono = { fontFamily: M, fontSize: 19, color: pal.ink };
-    const stepLabel = { fontFamily: F, fontWeight: 600, fontSize: 23, color: pal.ink };
+    const soft = pal.dark ? 'rgba(242,239,232,0.08)' : 'rgba(16,18,21,0.06)';
+    const phase = p < 0.14 ? 0 : p < 0.48 ? 1 : p < 0.78 ? 2 : 3;
+    const flowIn = ez(p, 0.15, 0.05);
+    const step1 = ez(p, 0.18, 0.06);
+    const step2 = ez(p, 0.26, 0.06);
+    const chanE = ez(p, 0.3, 0.05);
+    const chanS = ez(p, 0.335, 0.05);
+    const step3 = ez(p, 0.38, 0.06);
+    const arrow1 = ez(p, 0.24, 0.04);
+    const arrow2 = ez(p, 0.36, 0.04);
+    const docIn = ez(p, 0.5, 0.06);
+    const strike1 = ez(p, 0.56, 0.05);
+    const strike2 = ez(p, 0.615, 0.05);
+    const backIn = ez(p, 0.68, 0.06);
+    const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
+    const MailIcon = ({ size = 22 }) => (
+      <svg width={size} height={size * 0.82} viewBox="0 0 22 18"><rect x="1" y="1" width="20" height="16" rx="2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" /><polyline points="1.5,2.5 11,10 20.5,2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" strokeLinejoin="round" /></svg>
+    );
+    const SlackIcon = ({ size = 20 }) => (
+      <svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+        <path d="M7.2 12.6a1.8 1.8 0 1 1-1.8-1.8h1.8v1.8Zm.9 0a1.8 1.8 0 1 1 3.6 0v4.5a1.8 1.8 0 1 1-3.6 0v-4.5Z" fill={pal.ink} />
+        <path d="M7.4 7.2a1.8 1.8 0 1 1 1.8-1.8v1.8H7.4Zm0 .9a1.8 1.8 0 1 1 0 3.6H2.9a1.8 1.8 0 1 1 0-3.6h4.5Z" fill={pal.ink} />
+        <path d="M12.8 7.4a1.8 1.8 0 1 1 1.8 1.8h-1.8V7.4Zm-.9 0a1.8 1.8 0 1 1-3.6 0V2.9a1.8 1.8 0 1 1 3.6 0v4.5Z" fill={pal.ink} />
+        <path d="M12.6 12.8a1.8 1.8 0 1 1-1.8 1.8v-1.8h1.8Zm0-.9a1.8 1.8 0 1 1 0-3.6h4.5a1.8 1.8 0 1 1 0 3.6h-4.5Z" fill={pal.ink} />
+      </svg>
+    );
+    const FlowArrow = ({ opacity }) => (
+      <div style={{ width: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity, flexShrink: 0 }}>
+        <svg width="36" height="16" viewBox="0 0 36 16"><path d="M2 8 H28 M22 2 L30 8 L22 14" fill="none" stroke={pal.accent} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </div>
+    );
+    const StepCard = ({ opacity, y, num, title, children }) => (
+      <div style={{
+        width: 300, minHeight: 280, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
+        boxShadow: '0 18px 44px rgba(16,18,21,0.08)', padding: '26px 24px 28px',
+        opacity, transform: `translateY(${(1 - y) * 28}px)`, display: 'flex', flexDirection: 'column', gap: 16,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ width: 34, height: 34, borderRadius: 17, background: pal.accent, color: '#fff', fontFamily: M, fontSize: 16, fontWeight: 500, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{num}</span>
+          <span style={{ fontFamily: M, fontSize: 15, letterSpacing: '0.14em', color: pal.ink, opacity: 0.55 }}>{title}</span>
+        </div>
+        {children}
+      </div>
+    );
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
         {phase === 0 ? <SectionTitle p={p} num="03" text="NDA AUTOMATION" /> : <Kicker p={p} at={0} num="03" text="NDA AUTOMATION" />}
         {phase === 0 && <HookLines p={p} l1="Another NDA just landed." l2="It's the ninth this week." />}
         {phase === 1 && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: 1120, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 40px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${0.96 + 0.04 * cardIn})` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 26 }}>
-                <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
-                <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>AGENT</span>
-              </div>
-              <div style={{ background: pillBg, borderRadius: 14, padding: '18px 26px', opacity: mailIn, transform: `translateX(${(1 - mailIn) * -30}px)`, display: 'flex', alignItems: 'center', gap: 20 }}>
-                <span style={{ width: 46, height: 46, borderRadius: 23, flexShrink: 0, background: pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.06)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="22" height="18" viewBox="0 0 22 18"><rect x="1" y="1" width="20" height="16" rx="2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" /><polyline points="1.5,2.5 11,10 20.5,2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" strokeLinejoin="round" /></svg>
-                </span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ ...mono, opacity: 0.55, fontSize: 16, marginBottom: 6 }}>INBOUND EMAIL · legal@acmecorp.com</div>
-                  <div style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink }}>Mutual NDA for signature</div>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, opacity: flowIn }}>
+            <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', gap: 0 }}>
+              <StepCard opacity={step1} y={step1} num="1" title="FUND RECEIVES">
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 24, color: pal.ink, lineHeight: 1.25 }}>NDA arrives in the fund inbox</div>
+                <div style={{ background: pillBg, borderRadius: 14, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14, marginTop: 4 }}>
+                  <span style={{ width: 42, height: 42, borderRadius: 21, background: soft, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><MailIcon /></span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ ...mono, fontSize: 13, opacity: 0.5, marginBottom: 4 }}>FROM · legal@acmecorp.com</div>
+                    <div style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink }}>Mutual NDA for signature</div>
+                  </div>
                 </div>
-                <span style={{ ...mono, fontSize: 17, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '7px 16px' }}>Acme_Mutual_NDA_v3.docx</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginTop: 26 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, opacity: s1, transform: `translateY(${(1 - s1) * 14}px)` }}>
-                  <Check on={s1 > 0.5} accent={pal.accent} />
-                  <span style={stepLabel}>NDA recognised — mutual, inbound paper</span>
+                <span style={{ ...mono, fontSize: 14, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '7px 14px', alignSelf: 'flex-start' }}>Acme_Mutual_NDA_v3.docx</span>
+              </StepCard>
+              <FlowArrow opacity={arrow1} />
+              <StepCard opacity={step2} y={step2} num="2" title="SEND TO PERRY">
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 24, color: pal.ink, lineHeight: 1.25 }}>Forward by Email or Slack</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderRadius: 12, background: pillBg, opacity: chanE, transform: `translateX(${(1 - chanE) * -16}px)`, border: `1.5px solid ${chanE > 0.7 ? pal.accent : 'transparent'}` }}>
+                    <span style={{ width: 38, height: 38, borderRadius: 19, background: soft, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><MailIcon size={18} /></span>
+                    <div>
+                      <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>Email</div>
+                      <div style={{ ...mono, fontSize: 13, opacity: 0.5 }}>nda@perry.legal</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderRadius: 12, background: pillBg, opacity: chanS, transform: `translateX(${(1 - chanS) * -16}px)`, border: `1.5px solid ${chanS > 0.7 ? pal.accent : 'transparent'}` }}>
+                    <span style={{ width: 38, height: 38, borderRadius: 19, background: soft, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><SlackIcon /></span>
+                    <div>
+                      <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>Slack</div>
+                      <div style={{ ...mono, fontSize: 13, opacity: 0.5 }}>#legal → @Perry</div>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, opacity: s2, transform: `translateY(${(1 - s2) * 14}px)` }}>
-                  <Check on={s2 > 0.6} accent={pal.accent} />
-                  <span style={stepLabel}>Applying rule set: <span style={{ color: pal.accent }}>NDA review rules</span></span>
-                  <span style={{ ...mono, fontSize: 16, opacity: 0.55 }}>12 rules</span>
+              </StepCard>
+              <FlowArrow opacity={arrow2} />
+              <StepCard opacity={step3} y={step3} num="3" title="PERRY RETURNS">
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 24, color: pal.ink, lineHeight: 1.25 }}>Review, redline, send back</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 4 }}>
+                  {[
+                    ['Reviews against NDA rules', true],
+                    ['Applies tracked redlines', true],
+                    ['Returns draft to the fund', true],
+                  ].map(([t, on], i) => {
+                    const e = ez(p, 0.4 + i * 0.025, 0.04);
+                    return (
+                      <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: e, transform: `translateY(${(1 - e) * 10}px)` }}>
+                        <Check on={on && e > 0.55} accent={pal.accent} />
+                        <span style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink }}>{t}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
+                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, opacity: ez(p, 0.455, 0.04) }}>
+                  <img src="assets/perry-logo.png" alt="Perry" style={{ height: 18, filter: pal.dark ? 'invert(1)' : 'none' }} />
+                  <span style={{ ...mono, fontSize: 14, opacity: 0.5 }}>agent running</span>
+                </div>
+              </StepCard>
+            </div>
+            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.42, 0.06) }}>
+              Inbox in. Redline out. <span style={{ color: pal.accent }}>No new tool to open.</span>
             </div>
           </div>
         )}
@@ -310,19 +375,22 @@
                 <strong>9. Governing Law.</strong> This Agreement shall be governed by the laws of <Redline strike={strike2} to="England and Wales" accent={pal.accent}>the State of New York</Redline>, and the parties submit to the exclusive jurisdiction of its courts.
               </div>
             </div>
-            <div style={{ width: 900, display: 'flex', alignItems: 'center', gap: 14, opacity: s3, transform: `translateY(${(1 - s3) * 12}px)` }}>
-              <Check on={s3 > 0.5} accent={pal.accent} />
-              <span style={{ fontFamily: F, fontWeight: 600, fontSize: 21, color: pal.ink }}>Redlined draft returned to sender</span>
-              <span style={{ ...mono, fontSize: 16, opacity: 0.55 }}>reply drafted · changes summarised</span>
+            <div style={{ width: 900, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 14, padding: '18px 24px', display: 'flex', alignItems: 'center', gap: 16, opacity: backIn, transform: `translateY(${(1 - backIn) * 14}px)`, boxShadow: '0 12px 32px rgba(16,18,21,0.08)' }}>
+              <Check on={backIn > 0.5} accent={pal.accent} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>Redlined draft returned to the fund</div>
+                <div style={{ ...mono, fontSize: 15, opacity: 0.55, marginTop: 4 }}>via Email · Slack · changes summarised</div>
+              </div>
+              <span style={{ ...mono, fontSize: 14, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '7px 14px' }}>→ fund inbox</span>
             </div>
           </div>
         )}
         {phase === 3 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.75} size={122} color={pal.ink}>Reviewed before</Slam>
-            <Slam p={p} at={0.775} size={122} color={pal.accent}>you’ve opened the email.</Slam>
+            <Slam p={p} at={0.79} size={122} color={pal.ink}>Reviewed before</Slam>
+            <Slam p={p} at={0.815} size={122} color={pal.accent}>you’ve opened the email.</Slam>
             <div style={{ marginTop: 56 }}>
-              <KpiFlip p={p} at={0.795} label="NDA review" from="30 min" to="7 min" />
+              <KpiFlip p={p} at={0.835} label="NDA review" from="30 min" to="7 min" />
             </div>
           </div>
         )}
