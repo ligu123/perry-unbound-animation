@@ -773,7 +773,7 @@
     return (
       <Pal.Provider value={pal}>
         <div style={{ position: 'fixed', inset: 0, background: pal.paper }}>
-          <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="assets/a-little-higher.mp3" soundtrackStart={11} soundtrackVolume={0.85}>
+          <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="assets/a-little-higher.mp3" soundtrackStart={0} soundtrackVolume={0.85}>
             {{ Hook: SHook, Ask: SAsk, NDA: SNda, Patterns: SPatterns, Tracked: STrack, Close: SClose, Perry: SLogo }}
           </SceneStage>
         </div>
