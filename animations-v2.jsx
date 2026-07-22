@@ -1080,7 +1080,17 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
   const wantPlayRef = React.useRef(false);
   const wasPlayingRef = React.useRef(false);
   const lastTimeRef = React.useRef(time);
-  const readyRef = React.useRef(false);
+  const syncRef = React.useRef({ start, time, playing, duration });
+  syncRef.current = { start, time, playing, duration };
+
+  const tryPlay = React.useCallback(() => {
+    const a = ref.current;
+    if (!a) return;
+    a.muted = false;
+    a.volume = volume;
+    const p = a.play();
+    if (p && p.catch) p.catch(() => {});
+  }, [volume]);
 
   React.useEffect(() => {
     const a = ref.current;
@@ -1092,14 +1102,8 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
   React.useEffect(() => {
     const a = ref.current;
     if (!a) return;
-    const onReady = () => { readyRef.current = true; };
-    a.addEventListener('loadedmetadata', onReady);
-    a.addEventListener('canplay', onReady);
-    if (a.readyState >= 1) readyRef.current = true;
-    return () => {
-      a.removeEventListener('loadedmetadata', onReady);
-      a.removeEventListener('canplay', onReady);
-    };
+    // Force reload when the file changes (same path, new bytes / cache-bust).
+    a.load();
   }, [src]);
 
   React.useEffect(() => {
@@ -1123,29 +1127,35 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
     // pause/scrub, play-start, ended-restart, or rare large drift.
     const needsRestart = a.ended || (pastEnd === false && a.currentTime > capped + 1);
     const shouldSeek = !playing || startedPlaying || jumped || needsRestart || drift > 0.5;
-    if (shouldSeek && drift > 0.03) {
+    if (shouldSeek && (drift > 0.03 || needsRestart || a.ended)) {
       try { a.currentTime = capped; } catch {}
     }
 
     wantPlayRef.current = playing && !pastEnd && time < duration - 0.001;
     if (wantPlayRef.current) {
-      if (a.paused || a.ended) {
-        const p = a.play();
-        if (p && p.catch) p.catch(() => {});
-      }
+      if (a.paused || a.ended) tryPlay();
     } else if (!a.paused) {
       a.pause();
     }
-  }, [time, playing, start, duration]);
+  }, [time, playing, start, duration, tryPlay]);
 
-  // Unlock audio after the first user gesture if autoplay was blocked.
+  // Browsers block autoplay-with-sound — unlock on the first gesture and
+  // sync to the current playhead. Audio is portaled to document.body
+  // because <audio> inside svg/foreignObject often cannot play.
   React.useEffect(() => {
     const unlock = () => {
       const a = ref.current;
-      if (!a || !wantPlayRef.current) return;
-      a.muted = false;
-      const p = a.play();
-      if (p && p.catch) p.catch(() => {});
+      if (!a) return;
+      const s = syncRef.current;
+      const target = Math.max(0, s.start + s.time);
+      try {
+        if (isFinite(a.duration) && a.duration > 0) {
+          a.currentTime = Math.min(target, Math.max(0, a.duration - 0.05));
+        } else {
+          a.currentTime = target;
+        }
+      } catch {}
+      if (s.playing) tryPlay();
     };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
@@ -1153,18 +1163,21 @@ function AudioSprite({ src, start = 0, volume = 1, loop = false }) {
       window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('keydown', unlock);
     };
-  }, []);
+  }, [tryPlay]);
 
-  return (
+  const node = (
     <audio
       ref={ref}
-      key={src}
       src={src}
       preload="auto"
       playsInline
       style={{ display: 'none' }}
     />
   );
+  // Keep the element outside the Stage svg/foreignObject.
+  return (typeof document !== 'undefined' && document.body)
+    ? ReactDOM.createPortal(node, document.body)
+    : node;
 }
 
 
@@ -1599,7 +1612,8 @@ function SceneStage(props) {
   );
   return (
     <Stage width={width} height={height} duration={total} background={bg}
-           autoplay={autoplay} loop={loop} playback={pb}>
+           autoplay={autoplay} loop={loop} playback={pb}
+           persistKey={props.persistKey || 'animstage'}>
       {inner}
     </Stage>
   );
