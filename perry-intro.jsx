@@ -10,9 +10,9 @@
 
   function Kicker({ p, at, num, text }) {
     const pal = React.useContext(Pal);
-    const e = ez(p, at, 0.08);
+    const e = ez(p, at, 0.04);
     return (
-      <div style={{ position: 'absolute', top: 72, left: 110, fontFamily: M, fontSize: 26, letterSpacing: '0.18em', color: pal.ink, opacity: e * 0.9, transform: `translateX(${(1 - e) * -24}px)`, display: 'flex', gap: 20 }}>
+      <div style={{ position: 'absolute', top: 72, left: 110, fontFamily: M, fontSize: 26, letterSpacing: '0.18em', color: pal.ink, opacity: e * 0.9, transform: `translateX(${(1 - e) * -16}px)`, display: 'flex', gap: 20 }}>
         <span style={{ color: pal.accent, fontWeight: 500 }}>{num}</span>
         <span>{text}</span>
       </div>
@@ -21,11 +21,11 @@
 
   function SectionTitle({ p, num, text }) {
     const pal = React.useContext(Pal);
-    const e = ez(p, 0.005, 0.05);
-    const w = ez(p, 0.03, 0.07);
+    const e = ez(p, 0.005, 0.028);
+    const w = ez(p, 0.02, 0.04);
     return (
       <div style={{ position: 'absolute', top: 130, left: 110 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 24, opacity: e, transform: `translateY(${(1 - e) * 22}px)` }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 24, opacity: e, transform: `translateY(${(1 - e) * 14}px)` }}>
           <span style={{ fontFamily: T, fontWeight: 600, fontSize: 66, color: pal.accent }}>{num}</span>
           <span style={{ fontFamily: M, fontSize: 31, letterSpacing: '0.24em', color: pal.ink }}>{text}</span>
         </div>
@@ -34,11 +34,11 @@
     );
   }
 
-  function Slam({ p, at, dur = 0.09, size = 150, color, style, children }) {
+  function Slam({ p, at, dur = 0.045, size = 150, color, style, children }) {
     const raw = clamp((p - at) / dur, 0, 1);
     const e = Easing.easeOutCubic(raw);
     return (
-      <div style={{ fontFamily: T, fontWeight: 600, fontSize: size, lineHeight: 1.04, letterSpacing: '-0.01em', color, opacity: raw === 0 ? 0 : Math.min(1, raw * 3), transform: `translateY(${(1 - e) * 46}px) scale(${1.28 - 0.28 * e})`, transformOrigin: 'left bottom', ...style }}>
+      <div style={{ fontFamily: T, fontWeight: 600, fontSize: size, lineHeight: 1.04, letterSpacing: '-0.01em', color, opacity: raw === 0 ? 0 : Math.min(1, raw * 5), transform: `translateY(${(1 - e) * 28}px) scale(${1.16 - 0.16 * e})`, transformOrigin: 'left bottom', ...style }}>
         {children}
       </div>
     );
@@ -46,18 +46,18 @@
 
   function KpiFlip({ p, at, label, from, to }) {
     const pal = React.useContext(Pal);
-    const e1 = ez(p, at, 0.05);
-    const st = ez(p, at + 0.04, 0.04);
-    const e2 = ez(p, at + 0.07, 0.06, Easing.easeOutBack);
+    const e1 = ez(p, at, 0.03);
+    const st = ez(p, at + 0.025, 0.025);
+    const e2 = ez(p, at + 0.045, 0.035, Easing.easeOutBack);
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 30, opacity: e1, transform: `translateY(${(1 - e1) * 24}px)` }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 30, opacity: e1, transform: `translateY(${(1 - e1) * 14}px)` }}>
         <span style={{ fontFamily: M, fontSize: 25, letterSpacing: '0.12em', opacity: 0.62, color: pal.ink, width: 470, textTransform: 'uppercase' }}>{label}</span>
         <span style={{ position: 'relative', fontFamily: M, fontSize: 42, color: pal.ink, opacity: 0.55, whiteSpace: 'nowrap' }}>
           {from}
           <span style={{ position: 'absolute', left: -4, top: '52%', height: 5, width: `${st * 106}%`, background: pal.accent, borderRadius: 3 }} />
         </span>
         <span style={{ fontFamily: M, fontSize: 42, color: pal.ink, opacity: e2 > 0 ? 0.8 : 0 }}>→</span>
-        <span style={{ fontFamily: T, fontWeight: 600, fontSize: 58, color: pal.accent, opacity: Math.min(1, e2 * 2), transform: `scale(${0.7 + 0.3 * e2})`, display: 'inline-block', transformOrigin: 'left center', whiteSpace: 'nowrap' }}>{to}</span>
+        <span style={{ fontFamily: T, fontWeight: 600, fontSize: 58, color: pal.accent, opacity: Math.min(1, e2 * 2.5), transform: `scale(${0.78 + 0.22 * e2})`, display: 'inline-block', transformOrigin: 'left center', whiteSpace: 'nowrap' }}>{to}</span>
       </div>
     );
   }
@@ -65,10 +65,10 @@
   function SHook() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
-    const logo = ez(p, 0.04, 0.12);
-    const logoPop = ez(p, 0.04, 0.18, Easing.easeOutBack);
-    const rule = ez(p, 0.22, 0.1);
-    const line = ez(p, 0.32, 0.1);
+    const logo = ez(p, 0.03, 0.06);
+    const logoPop = ez(p, 0.03, 0.1, Easing.easeOutBack);
+    const rule = ez(p, 0.16, 0.05);
+    const line = ez(p, 0.22, 0.05);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <img src="assets/perry-logo.png" alt="Perry" style={{ width: 620, opacity: logo, transform: `scale(${0.85 + 0.15 * logoPop})`, filter: pal.dark ? 'invert(1)' : 'none' }} />
@@ -82,8 +82,8 @@
     const pal = React.useContext(Pal);
     return (
       <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <Slam p={p} at={0.02} size={size} color={pal.ink}>{l1}</Slam>
-        <Slam p={p} at={0.075} size={size} color={pal.accent}>{l2}</Slam>
+        <Slam p={p} at={0.015} size={size} color={pal.ink}>{l1}</Slam>
+        <Slam p={p} at={0.045} size={size} color={pal.accent}>{l2}</Slam>
       </div>
     );
   }
@@ -93,11 +93,11 @@
     const pal = React.useContext(Pal);
     return (
       <div style={{ position: 'absolute', inset: 0, padding: '0 120px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        {pre && <div style={{ fontFamily: M, fontSize: 28, color: pal.ink, opacity: ez(p, Math.max(0, at - 0.04), 0.05) * 0.7, marginBottom: 30 }}>{pre}</div>}
+        {pre && <div style={{ fontFamily: M, fontSize: 28, color: pal.ink, opacity: ez(p, Math.max(0, at - 0.03), 0.03) * 0.7, marginBottom: 30 }}>{pre}</div>}
         <div style={{ fontFamily: T, fontWeight: 600, fontSize: 88, lineHeight: 1.18, maxWidth: 1320, letterSpacing: '-0.01em', fontStyle: 'italic' }}>
           {words.map(([w, acc], i) => {
-            const e = ez(p, at + i * 0.012, 0.045);
-            return <span key={i} style={{ display: 'inline-block', marginRight: '0.26em', opacity: e, transform: `translateY(${(1 - e) * 30}px)`, color: acc ? pal.accent : pal.ink }}>{w}</span>;
+            const e = ez(p, at + i * 0.007, 0.028);
+            return <span key={i} style={{ display: 'inline-block', marginRight: '0.26em', opacity: e, transform: `translateY(${(1 - e) * 18}px)`, color: acc ? pal.accent : pal.ink }}>{w}</span>;
           })}
         </div>
       </div>
@@ -203,8 +203,8 @@
         {phase === 2 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Slam p={p} at={0.71} size={150} color={pal.ink}>Ask.</Slam>
-            <Slam p={p} at={0.74} size={150} color={pal.ink}>Answered.</Slam>
-            <Slam p={p} at={0.77} size={150} color={pal.accent}>Cited.<span style={{ display: 'inline-block', fontFamily: M, fontStyle: 'normal', fontSize: 34, fontWeight: 400, color: pal.accent, border: `2px solid ${pal.accent}`, borderRadius: 10, padding: '2px 18px', marginLeft: 26, verticalAlign: '18px' }}>1</span></Slam>
+            <Slam p={p} at={0.73} size={150} color={pal.ink}>Answered.</Slam>
+            <Slam p={p} at={0.75} size={150} color={pal.accent}>Cited.<span style={{ display: 'inline-block', fontFamily: M, fontStyle: 'normal', fontSize: 34, fontWeight: 400, color: pal.accent, border: `2px solid ${pal.accent}`, borderRadius: 10, padding: '2px 18px', marginLeft: 26, verticalAlign: '18px' }}>1</span></Slam>
             <div style={{ marginTop: 52 }}>
               <KpiFlip p={p} at={0.8} label="Deal question" from="2 hrs" to="4 min" />
             </div>
@@ -346,7 +346,7 @@
                 </div>
               </StepCard>
             </div>
-            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.4, 0.06) }}>
+            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.4, 0.035) }}>
               Inbox in. Redline out. <span style={{ color: pal.accent }}>No new tool to open.</span>
             </div>
           </div>
@@ -388,7 +388,7 @@
         {phase === 3 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Slam p={p} at={0.82} size={122} color={pal.ink}>Reviewed before</Slam>
-            <Slam p={p} at={0.845} size={122} color={pal.accent}>you’ve opened the email.</Slam>
+            <Slam p={p} at={0.835} size={122} color={pal.accent}>you’ve opened the email.</Slam>
             <div style={{ marginTop: 56 }}>
               <KpiFlip p={p} at={0.865} label="NDA review" from="30 min" to="7 min" />
             </div>
@@ -462,7 +462,7 @@
                 <span style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink }}>1× non-participating is becoming your market standard — up 18% year-on-year.</span>
               </div>
             </div>
-            <div style={{ width: 1160, opacity: ez(p, 0.28, 0.06), transform: `translateY(${(1 - ez(p, 0.28, 0.06)) * 14}px)` }}>
+            <div style={{ width: 1160, opacity: ez(p, 0.28, 0.035), transform: `translateY(${(1 - ez(p, 0.28, 0.035)) * 10}px)` }}>
               <span style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 27, color: pal.ink }}>Your next term sheet, negotiated from data — <span style={{ color: pal.accent }}>not recollection.</span></span>
             </div>
           </div>
@@ -471,7 +471,7 @@
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div>
               <Slam p={p} at={0.77} size={108} color={pal.ink}>One document is an answer.</Slam>
-              <Slam p={p} at={0.81} size={108} color={pal.accent}>Two hundred are a strategy.</Slam>
+              <Slam p={p} at={0.79} size={108} color={pal.accent}>Two hundred are a strategy.</Slam>
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols},1fr)`, gap: 10, marginTop: 60, width: 1150 }}>
                 {Array.from({ length: total }, (_, i) => {
                   const on = i < fillN;
@@ -727,8 +727,8 @@
         {phase === 4 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Slam p={p} at={0.82} size={98} color={pal.ink}>Every obligation — an owner,</Slam>
-            <Slam p={p} at={0.84} size={98} color={pal.ink}>a deadline, a paper trail.</Slam>
-            <Slam p={p} at={0.86} size={132} color={pal.accent}>Nothing slips.</Slam>
+            <Slam p={p} at={0.835} size={98} color={pal.ink}>a deadline, a paper trail.</Slam>
+            <Slam p={p} at={0.85} size={132} color={pal.accent}>Nothing slips.</Slam>
             <div style={{ marginTop: 44 }}>
               <KpiFlip p={p} at={0.875} label="Post-investment follow-up" from="Email chains" to="Shared tracking" />
             </div>
@@ -743,8 +743,8 @@
     const pal = React.useContext(Pal);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <Slam p={p} at={0.08} size={72} color={pal.ink}>General legal AI completes a single task faster.</Slam>
-        <Slam p={p} at={0.28} size={88} color={pal.accent}>Perry runs the fund for you.</Slam>
+        <Slam p={p} at={0.06} size={72} color={pal.ink}>General legal AI completes a single task faster.</Slam>
+        <Slam p={p} at={0.16} size={88} color={pal.accent}>Perry runs the fund for you.</Slam>
       </div>
     );
   }
@@ -752,10 +752,10 @@
   function SLogo() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
-    const e = ez(p, 0.1, 0.2, Easing.easeOutBack);
-    const o = ez(p, 0.1, 0.12);
-    const e2 = ez(p, 0.4, 0.12);
-    const e3 = ez(p, 0.56, 0.12);
+    const e = ez(p, 0.08, 0.12, Easing.easeOutBack);
+    const o = ez(p, 0.08, 0.06);
+    const e2 = ez(p, 0.32, 0.06);
+    const e3 = ez(p, 0.44, 0.06);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 44 }}>
         <img src="assets/perry-logo.png" alt="Perry" style={{ width: 540, opacity: o, transform: `scale(${0.8 + 0.2 * e})`, filter: pal.dark ? 'invert(1)' : 'none' }} />
