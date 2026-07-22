@@ -88,7 +88,7 @@
     );
   }
 
-  const QUOTE = [['“What', 0], ['are', 0], ['the', 0], ['liquidation', 1], ['preferences', 1], ['across', 0], ['our', 0], ['portfolio?”', 0]];
+  const QUOTE = [['“Does', 0], ['the', 0], ['SPA', 1], ['require', 0], ['consent', 1], ['for', 0], ['this', 0], ['secondary', 1], ['transfer?”', 0]];
   function Quote({ p, at, words, pre }) {
     const pal = React.useContext(Pal);
     return (
@@ -149,36 +149,38 @@
           <div style={{ padding: '36px 48px 18px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: `1px solid ${cardBorder}`, paddingBottom: 20 }}>
             <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
             <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>ASSISTANT</span>
+            <span style={{ flex: 1 }} />
+            <span style={{ fontFamily: M, fontSize: 15, color: pal.ink, opacity: 0.45 }}>Orange Ltd · Series B</span>
           </div>
           <div style={{ position: 'absolute', left: 0, right: 0, top: 80, bottom: 0, overflow: 'hidden' }}>
             <div ref={colRef} style={{ position: 'absolute', left: 48, right: 48, top: 0, transform: `translateY(${24 - scroll}px)` }}>
               <div style={{ background: pillBg, borderRadius: 999, padding: '18px 30px', fontFamily: M, fontSize: 22, color: pal.ink }}>
-                What are the liquidation preferences across our portfolio?
+                Does the SPA require consent for this secondary transfer?
               </div>
               <div style={{ opacity: reveal, transform: `translateY(${(1 - reveal) * 16}px)` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 6px', fontFamily: M, fontSize: 17, color: pal.ink, opacity: 0.55 }}>
                   <span style={{ width: 13, height: 16, border: `1.5px solid ${pal.ink}`, borderRadius: 3, display: 'inline-block' }} />
-                  Searched documents
+                  Searched deal room · 3 documents
                 </div>
-                <div style={{ ...body, margin: '14px 0 4px' }}>Here is a summary of your liquidation preference terms across the three portfolio companies found in the documents:</div>
-                <div style={h2}>Orange Ltd — Series A AoA</div>
+                <div style={{ ...body, margin: '14px 0 4px' }}>Yes — subject to limited exceptions. Across the Orange Ltd Series B suite:</div>
+                <div style={h2}>Share Purchase Agreement — cl. 8.2</div>
                 <div style={body}>
-                  A <strong>participating, as-converted</strong> preference — on liquidation: first, £0.01 total to Deferred Shareholders; second, to each Preferred Shareholder the greater of the Preference Amount or the as-converted Ordinary Share value; thereafter, the balance to Ordinary Shareholders pro rata.{badge('1', hover, badgeRef)}
+                  Secondary transfers of Preferred Shares require <strong>prior written consent of the Majority Preferred</strong>, except for Permitted Transfers to Affiliates on the same terms.{badge('1', hover, badgeRef)}
                 </div>
-                <div style={h2}>Grape Ltd — Seed AoA</div>
+                <div style={h2}>Shareholders&apos; Agreement — ROFR</div>
                 <div style={body}>
-                  A <strong>1× non-participating</strong> preference (return of Issue Price only), with deemed conversion at the applicable Conversion Ratio where an as-converted basis pays more.{badge('2', false, null)}
+                  Before any transfer, the selling shareholder must first offer the shares to existing Preferred under the <strong>right of first refusal</strong>; investor consent alone does not bypass that process.{badge('2', false, null)}
                 </div>
-                <div style={h2}>Mango Ltd — Series A AoA</div>
+                <div style={h2}>Management Side Letter — carve-out</div>
                 <div style={body}>
-                  A more complex <strong>multi-tranche</strong> waterfall with a <strong>1.2× preference</strong> at each level — Series A-2 first: 120% of the Series A-2 Issue Price plus all declared but unpaid dividends, in priority to all other share classes.{badge('3', false, null)}
+                  Transfers by Management Sellers of up to <strong>2% in aggregate per year</strong> are treated as Permitted Transfers and do <strong>not</strong> require Preferred consent.{badge('3', false, null)}
                 </div>
               </div>
               <div style={{ position: 'absolute', left: Math.max(0, bp.x - 450), top: bp.y + 22, width: 420, background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: `3px solid ${pal.accent}`, borderRadius: 12, boxShadow: '0 16px 40px rgba(16,18,21,0.18)', padding: '20px 24px', opacity: popVis, transform: `translateY(${(1 - popVis) * 10}px)`, zIndex: 20 }}>
-                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.4 }}>Orange Ltd — Series A — Articles of Association.docx</div>
-                <div style={{ fontFamily: M, fontSize: 15, color: pal.accent, margin: '8px 0 10px' }}>Liquidation preference</div>
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.4 }}>Orange Ltd — Series B — Share Purchase Agreement.docx</div>
+                <div style={{ fontFamily: M, fontSize: 15, color: pal.accent, margin: '8px 0 10px' }}>cl. 8.2 · Transfer restrictions</div>
                 <div style={{ fontFamily: F, fontStyle: 'italic', fontSize: 16.5, lineHeight: 1.55, color: pal.ink, opacity: 0.85 }}>
-                  “On a distribution of assets on a voluntary or involuntary liquidation, dissolution, or winding up, the Surplus Assets of the Company shall be applied: first, in paying to the holders of the Deferred Shares a total of £0.01 for the entire class…”
+                  “No Preferred Shareholder shall Transfer any Preferred Shares without the prior written consent of the Majority Preferred, save for a Permitted Transfer to an Affiliate…”
                 </div>
               </div>
               <Cursor x={curX} y={curY} opacity={curO} />
@@ -196,7 +198,7 @@
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
         {phase === 0 ? <SectionTitle p={p} num="02" text="ASK ANYTHING" /> : <Kicker p={p} at={0.02} num="02" text="ASK ANYTHING" />}
-        {phase === 0 && <Quote p={p} at={0.07} words={QUOTE} pre="An LP asks, Friday 4:59pm —" />}
+        {phase === 0 && <Quote p={p} at={0.07} words={QUOTE} pre="Deal counsel, night before signing —" />}
         {phase === 1 && <AnswerDoc p={p} pal={pal} />}
         {phase === 2 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -204,7 +206,7 @@
             <Slam p={p} at={0.74} size={150} color={pal.ink}>Answered.</Slam>
             <Slam p={p} at={0.77} size={150} color={pal.accent}>Cited.<span style={{ display: 'inline-block', fontFamily: M, fontStyle: 'normal', fontSize: 34, fontWeight: 400, color: pal.accent, border: `2px solid ${pal.accent}`, borderRadius: 10, padding: '2px 18px', marginLeft: 26, verticalAlign: '18px' }}>1</span></Slam>
             <div style={{ marginTop: 52 }}>
-              <KpiFlip p={p} at={0.8} label="Portfolio question" from="45 min" to="3 min" />
+              <KpiFlip p={p} at={0.8} label="Deal question" from="2 hrs" to="4 min" />
             </div>
           </div>
         )}
