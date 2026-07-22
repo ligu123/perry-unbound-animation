@@ -241,19 +241,19 @@
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
     const soft = pal.dark ? 'rgba(242,239,232,0.08)' : 'rgba(16,18,21,0.06)';
-    const phase = p < 0.14 ? 0 : p < 0.48 ? 1 : p < 0.78 ? 2 : 3;
-    const flowIn = ez(p, 0.15, 0.05);
-    const step1 = ez(p, 0.18, 0.06);
-    const step2 = ez(p, 0.26, 0.06);
-    const chanE = ez(p, 0.3, 0.05);
-    const chanS = ez(p, 0.335, 0.05);
-    const step3 = ez(p, 0.38, 0.06);
-    const arrow1 = ez(p, 0.24, 0.04);
-    const arrow2 = ez(p, 0.36, 0.04);
-    const docIn = ez(p, 0.5, 0.06);
-    const strike1 = ez(p, 0.56, 0.05);
-    const strike2 = ez(p, 0.615, 0.05);
-    const backIn = ez(p, 0.68, 0.06);
+    const phase = p < 0.12 ? 0 : p < 0.56 ? 1 : p < 0.8 ? 2 : 3;
+    const flowIn = ez(p, 0.13, 0.05);
+    const step1 = ez(p, 0.16, 0.06);
+    const step2 = ez(p, 0.23, 0.06);
+    const chanE = ez(p, 0.27, 0.05);
+    const chanS = ez(p, 0.3, 0.05);
+    const step3 = ez(p, 0.34, 0.06);
+    const arrow1 = ez(p, 0.21, 0.04);
+    const arrow2 = ez(p, 0.32, 0.04);
+    const docIn = ez(p, 0.58, 0.06);
+    const strike1 = ez(p, 0.64, 0.05);
+    const strike2 = ez(p, 0.69, 0.05);
+    const backIn = ez(p, 0.735, 0.06);
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
     const MailIcon = ({ size = 22 }) => (
       <svg width={size} height={size * 0.82} viewBox="0 0 22 18"><rect x="1" y="1" width="20" height="16" rx="2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" /><polyline points="1.5,2.5 11,10 20.5,2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" strokeLinejoin="round" /></svg>
@@ -331,7 +331,7 @@
                     ['Applies tracked redlines', true],
                     ['Returns draft to the fund', true],
                   ].map(([t, on], i) => {
-                    const e = ez(p, 0.4 + i * 0.025, 0.04);
+                    const e = ez(p, 0.36 + i * 0.025, 0.04);
                     return (
                       <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: e, transform: `translateY(${(1 - e) * 10}px)` }}>
                         <Check on={on && e > 0.55} accent={pal.accent} />
@@ -340,13 +340,13 @@
                     );
                   })}
                 </div>
-                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, opacity: ez(p, 0.455, 0.04) }}>
+                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, opacity: ez(p, 0.42, 0.04) }}>
                   <img src="assets/perry-logo.png" alt="Perry" style={{ height: 18, filter: pal.dark ? 'invert(1)' : 'none' }} />
                   <span style={{ ...mono, fontSize: 14, opacity: 0.5 }}>agent running</span>
                 </div>
               </StepCard>
             </div>
-            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.42, 0.06) }}>
+            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.4, 0.06) }}>
               Inbox in. Redline out. <span style={{ color: pal.accent }}>No new tool to open.</span>
             </div>
           </div>
@@ -387,10 +387,10 @@
         )}
         {phase === 3 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.79} size={122} color={pal.ink}>Reviewed before</Slam>
-            <Slam p={p} at={0.815} size={122} color={pal.accent}>you’ve opened the email.</Slam>
+            <Slam p={p} at={0.82} size={122} color={pal.ink}>Reviewed before</Slam>
+            <Slam p={p} at={0.845} size={122} color={pal.accent}>you’ve opened the email.</Slam>
             <div style={{ marginTop: 56 }}>
-              <KpiFlip p={p} at={0.835} label="NDA review" from="30 min" to="7 min" />
+              <KpiFlip p={p} at={0.865} label="NDA review" from="30 min" to="7 min" />
             </div>
           </div>
         )}
