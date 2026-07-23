@@ -90,13 +90,13 @@
     );
   }
 
-  const QUOTE = [['“Does', 0], ['the', 0], ['SPA', 1], ['require', 0], ['consent', 1], ['for', 0], ['this', 0], ['secondary', 1], ['transfer?”', 0]];
+  const QUOTE = [['“Does', 0], ['Simon', 1], ['need', 0], ['to', 0], ['be', 0], ['given', 0], ['quarterly', 1], ['information', 1], ['rights?”', 1]];
   function Quote({ p, at, words, pre }) {
     const pal = React.useContext(Pal);
     return (
       <div style={{ position: 'absolute', inset: 0, padding: '0 120px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {pre && <div style={{ fontFamily: M, fontSize: 28, color: pal.ink, opacity: ez(p, Math.max(0, at - 0.03), 0.03) * 0.7, marginBottom: 30 }}>{pre}</div>}
-        <div style={{ fontFamily: T, fontWeight: 600, fontSize: 88, lineHeight: 1.18, maxWidth: 1320, letterSpacing: '-0.01em', fontStyle: 'italic' }}>
+        <div style={{ fontFamily: T, fontWeight: 600, fontSize: 78, lineHeight: 1.18, maxWidth: 1320, letterSpacing: '-0.01em', fontStyle: 'italic' }}>
           {words.map(([w, acc], i) => {
             const e = ez(p, at + i * 0.007, 0.028);
             return <span key={i} style={{ display: 'inline-block', marginRight: '0.26em', opacity: e, transform: `translateY(${(1 - e) * 18}px)`, color: acc ? pal.accent : pal.ink }}>{w}</span>;
@@ -132,7 +132,7 @@
     }, []);
     const cardIn = ez(p, 0.23, 0.06);
     const reveal = ez(p, 0.29, 0.07);
-    const scroll = Math.min(maxScroll, 130 * ez(p, 0.37, 0.06) + 430 * ez(p, 0.64, 0.07));
+    const scroll = Math.min(maxScroll, 90 * ez(p, 0.37, 0.06) + 360 * ez(p, 0.64, 0.07));
     const move = ez(p, 0.42, 0.06);
     const curX = bp.x + 300 * (1 - move) + 13;
     const curY = bp.y + 230 * (1 - move) - 2;
@@ -140,8 +140,9 @@
     const hover = p >= 0.475 && p < 0.64;
     const popVis = Math.min(ez(p, 0.495, 0.05), 1 - ez(p, 0.62, 0.05));
     const zoom = 1 + 0.09 * Math.min(ez(p, 0.46, 0.07), 1 - ez(p, 0.64, 0.07));
-    const h2 = { fontFamily: T, fontWeight: 600, fontSize: 30, color: pal.ink, margin: '34px 0 12px' };
-    const body = { fontFamily: F, fontWeight: 400, fontSize: 21.5, lineHeight: 1.55, color: pal.ink, opacity: 0.92 };
+    const h2 = { fontFamily: T, fontWeight: 600, fontSize: 28, color: pal.ink, margin: '28px 0 10px' };
+    const body = { fontFamily: F, fontWeight: 400, fontSize: 21, lineHeight: 1.55, color: pal.ink, opacity: 0.92 };
+    const step = { fontFamily: M, fontSize: 16, color: pal.ink, opacity: 0.55, marginBottom: 8, letterSpacing: '0.06em' };
     const badge = (n, hot, ref) => (
       <span ref={ref} style={{ display: 'inline-block', fontFamily: M, fontSize: 16, color: hot ? '#fff' : pal.accent, background: hot ? pal.accent : (pal.dark ? 'rgba(0,156,127,0.18)' : 'rgba(0,156,127,0.12)'), border: `1px solid ${pal.accent}`, borderRadius: 7, padding: '1px 9px', marginLeft: 8, verticalAlign: '2px', transform: hot ? 'scale(1.15)' : 'scale(1)' }}>{n}</span>
     );
@@ -152,37 +153,45 @@
             <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
             <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>ASSISTANT</span>
             <span style={{ flex: 1 }} />
-            <span style={{ fontFamily: M, fontSize: 15, color: pal.ink, opacity: 0.45 }}>Orange Ltd · Series B</span>
+            <span style={{ fontFamily: M, fontSize: 15, color: pal.ink, opacity: 0.45 }}>Northwind Fund I · LP desk</span>
           </div>
           <div style={{ position: 'absolute', left: 0, right: 0, top: 80, bottom: 0, overflow: 'hidden' }}>
             <div ref={colRef} style={{ position: 'absolute', left: 48, right: 48, top: 0, transform: `translateY(${24 - scroll}px)` }}>
-              <div style={{ background: pillBg, borderRadius: 999, padding: '18px 30px', fontFamily: M, fontSize: 22, color: pal.ink }}>
-                Does the SPA require consent for this secondary transfer?
+              <div style={{ background: pillBg, borderRadius: 999, padding: '18px 30px', fontFamily: M, fontSize: 21, color: pal.ink }}>
+                Does Simon need to be given quarterly information rights?
               </div>
               <div style={{ opacity: reveal, transform: `translateY(${(1 - reveal) * 16}px)` }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 6px', fontFamily: M, fontSize: 17, color: pal.ink, opacity: 0.55 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '22px 0 8px', fontFamily: M, fontSize: 17, color: pal.ink, opacity: 0.55 }}>
                   <span style={{ width: 13, height: 16, border: `1.5px solid ${pal.ink}`, borderRadius: 3, display: 'inline-block' }} />
-                  Searched deal room · 3 documents
+                  Reasoned across fund documents · 3 sources
                 </div>
-                <div style={{ ...body, margin: '14px 0 4px' }}>Yes — subject to limited exceptions. Across the Orange Ltd Series B suite:</div>
-                <div style={h2}>Share Purchase Agreement — cl. 8.2</div>
+
+                <div style={h2}>1. Identified the party</div>
                 <div style={body}>
-                  Secondary transfers of Preferred Shares require <strong>prior written consent of the Majority Preferred</strong>, except for Permitted Transfers to Affiliates on the same terms.{badge('1', hover, badgeRef)}
+                  <strong>Simon Hale</strong> is a Limited Partner on the Commitment Schedule — Class A, $8m commitment — not a manager or adviser.
                 </div>
-                <div style={h2}>Shareholders&apos; Agreement — ROFR</div>
+
+                <div style={h2}>2. Found the governing language</div>
                 <div style={body}>
-                  Before any transfer, the selling shareholder must first offer the shares to existing Preferred under the <strong>right of first refusal</strong>; investor consent alone does not bypass that process.{badge('2', false, null)}
+                  Pulled <strong>Simon Hale Side Letter</strong> and the <strong>Amended &amp; Restated LPA</strong>. Side letter controls where it conflicts with the LPA baseline.
                 </div>
-                <div style={h2}>Management Side Letter — carve-out</div>
+
+                <div style={h2}>3. Checked the relevant clause</div>
                 <div style={body}>
-                  Transfers by Management Sellers of up to <strong>2% in aggregate per year</strong> are treated as Permitted Transfers and do <strong>not</strong> require Preferred consent.{badge('3', false, null)}
+                  Side Letter <strong>§4.2 Information Rights</strong> requires quarterly unaudited financials within 45 days of quarter-end; LPA §11.3 only sets a semi-annual floor.{badge('1', hover, badgeRef)}
                 </div>
+
+                <div style={{ ...h2, color: pal.accent, marginTop: 32 }}>Answer</div>
+                <div style={body}>
+                  <strong>Yes.</strong> As an LP, Simon is entitled to <strong>quarterly information rights</strong> under his side letter — which tightens the LPA’s semi-annual reporting baseline. Deliver Q1–Q3 packs on the §4.2 timetable.
+                </div>
+                <div style={{ ...step, marginTop: 16 }}>Reasoning: party status → controlling instrument → clause comparison → obligation</div>
               </div>
-              <div style={{ position: 'absolute', left: Math.max(0, bp.x - 450), top: bp.y + 22, width: 420, background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: `3px solid ${pal.accent}`, borderRadius: 12, boxShadow: '0 16px 40px rgba(16,18,21,0.18)', padding: '20px 24px', opacity: popVis, transform: `translateY(${(1 - popVis) * 10}px)`, zIndex: 20 }}>
-                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.4 }}>Orange Ltd — Series B — Share Purchase Agreement.docx</div>
-                <div style={{ fontFamily: M, fontSize: 15, color: pal.accent, margin: '8px 0 10px' }}>cl. 8.2 · Transfer restrictions</div>
+              <div style={{ position: 'absolute', left: Math.max(0, bp.x - 450), top: bp.y + 22, width: 440, background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: `3px solid ${pal.accent}`, borderRadius: 12, boxShadow: '0 16px 40px rgba(16,18,21,0.18)', padding: '20px 24px', opacity: popVis, transform: `translateY(${(1 - popVis) * 10}px)`, zIndex: 20 }}>
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.4 }}>Simon_Hale_Side_Letter.pdf</div>
+                <div style={{ fontFamily: M, fontSize: 15, color: pal.accent, margin: '8px 0 10px' }}>§4.2 · Information Rights</div>
                 <div style={{ fontFamily: F, fontStyle: 'italic', fontSize: 16.5, lineHeight: 1.55, color: pal.ink, opacity: 0.85 }}>
-                  “No Preferred Shareholder shall Transfer any Preferred Shares without the prior written consent of the Majority Preferred, save for a Permitted Transfer to an Affiliate…”
+                  “The General Partner shall provide the Limited Partner with unaudited quarterly financial statements within forty-five (45) days after the end of each fiscal quarter…”
                 </div>
               </div>
               <Cursor x={curX} y={curY} opacity={curO} />
@@ -200,7 +209,7 @@
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
         {phase === 0 ? <SectionTitle p={p} num="02" text="ASK ANYTHING" /> : <Kicker p={p} at={0.02} num="02" text="ASK ANYTHING" />}
-        {phase === 0 && <Quote p={p} at={0.07} words={QUOTE} pre="Deal counsel, night before signing —" />}
+        {phase === 0 && <Quote p={p} at={0.07} words={QUOTE} pre="Fund counsel asks —" />}
         {phase === 1 && <AnswerDoc p={p} pal={pal} />}
         {phase === 2 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -208,7 +217,7 @@
             <Slam p={p} at={0.73} size={150} color={pal.ink}>Answered.</Slam>
             <Slam p={p} at={0.75} size={150} color={pal.accent}>Cited.<span style={{ display: 'inline-block', fontFamily: M, fontStyle: 'normal', fontSize: 34, fontWeight: 400, color: pal.accent, border: `2px solid ${pal.accent}`, borderRadius: 10, padding: '2px 18px', marginLeft: 26, verticalAlign: '18px' }}>1</span></Slam>
             <div style={{ marginTop: 52 }}>
-              <KpiFlip p={p} at={0.8} label="Deal question" from="2 hrs" to="4 min" />
+              <KpiFlip p={p} at={0.8} label="LP question" from="2 hrs" to="4 min" />
             </div>
           </div>
         )}
