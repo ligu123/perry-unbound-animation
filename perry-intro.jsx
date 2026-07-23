@@ -117,75 +117,92 @@
     const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
-    const badgeRef = React.useRef(null);
-    const colRef = React.useRef(null);
-    const [bp, setBp] = React.useState({ x: 640, y: 470 });
-    const [maxScroll, setMaxScroll] = React.useState(300);
-    React.useLayoutEffect(() => {
-      if (badgeRef.current && colRef.current) {
-        const b = badgeRef.current.getBoundingClientRect();
-        const c = colRef.current.getBoundingClientRect();
-        const k = colRef.current.offsetWidth / (c.width || 1);
-        setBp({ x: (b.left - c.left + b.width / 2) * k, y: (b.top - c.top + b.height / 2) * k });
-        setMaxScroll(Math.max(0, colRef.current.offsetHeight - 548));
-      }
-    }, []);
-    const cardIn = ez(p, 0.23, 0.06);
-    const reveal = ez(p, 0.29, 0.07);
-    const scroll = Math.min(maxScroll, 130 * ez(p, 0.37, 0.06) + 430 * ez(p, 0.64, 0.07));
-    const move = ez(p, 0.42, 0.06);
-    const curX = bp.x + 300 * (1 - move) + 13;
-    const curY = bp.y + 230 * (1 - move) - 2;
-    const curO = ez(p, 0.42, 0.04) * (1 - ez(p, 0.6, 0.04));
-    const hover = p >= 0.475 && p < 0.64;
-    const popVis = Math.min(ez(p, 0.495, 0.05), 1 - ez(p, 0.62, 0.05));
-    const zoom = 1 + 0.09 * Math.min(ez(p, 0.46, 0.07), 1 - ez(p, 0.64, 0.07));
-    const h2 = { fontFamily: T, fontWeight: 600, fontSize: 30, color: pal.ink, margin: '34px 0 12px' };
-    const body = { fontFamily: F, fontWeight: 400, fontSize: 21.5, lineHeight: 1.55, color: pal.ink, opacity: 0.92 };
-    const badge = (n, hot, ref) => (
-      <span ref={ref} style={{ display: 'inline-block', fontFamily: M, fontSize: 16, color: hot ? '#fff' : pal.accent, background: hot ? pal.accent : (pal.dark ? 'rgba(0,156,127,0.18)' : 'rgba(0,156,127,0.12)'), border: `1px solid ${pal.accent}`, borderRadius: 7, padding: '1px 9px', marginLeft: 8, verticalAlign: '2px', transform: hot ? 'scale(1.15)' : 'scale(1)' }}>{n}</span>
-    );
+    const soft = pal.dark ? 'rgba(242,239,232,0.08)' : 'rgba(16,18,21,0.05)';
+    const mono = { fontFamily: M, fontSize: 16, color: pal.ink };
+    const cardIn = ez(p, 0.02, 0.07);
+    const qIn = ez(p, 0.08, 0.05);
+    const steps = [
+      {
+        at: 0.16,
+        label: 'IDENTIFY',
+        title: 'Resolve who “Simon” is',
+        detail: 'Matched Simon Hale → Limited Partner · Fund III',
+        meta: 'cap table · investor register',
+      },
+      {
+        at: 0.28,
+        label: 'RETRIEVE',
+        title: 'Pull governing documents',
+        detail: 'LPA §12.4 · Simon Hale Side Letter (2023)',
+        meta: '2 instruments loaded',
+      },
+      {
+        at: 0.4,
+        label: 'CHECK',
+        title: 'Evaluate information-rights clause',
+        detail: 'LP threshold met · quarterly pack required within 45 days',
+        meta: 'LPA §12.4(b) · Side Letter cl. 3',
+      },
+      {
+        at: 0.52,
+        label: 'ANSWER',
+        title: 'Return decision with reasoning',
+        detail: 'Yes — Simon is entitled to quarterly information rights.',
+        meta: 'cited · actionable',
+      },
+    ];
+    const answerIn = ez(p, 0.58, 0.07);
     return (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 1120, height: 660, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${(0.96 + 0.04 * cardIn) * zoom})`, transformOrigin: '42% 45%', overflow: 'hidden', position: 'relative' }}>
-          <div style={{ padding: '36px 48px 18px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: `1px solid ${cardBorder}`, paddingBottom: 20 }}>
+        <div style={{ width: 1120, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '32px 44px 36px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 36}px) scale(${0.97 + 0.03 * cardIn})` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22 }}>
             <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
-            <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>ASSISTANT</span>
+            <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>AGENT</span>
             <span style={{ flex: 1 }} />
-            <span style={{ fontFamily: M, fontSize: 15, color: pal.ink, opacity: 0.45 }}>Orange Ltd · Series B</span>
+            <span style={{ ...mono, fontSize: 14, opacity: 0.45 }}>runtime · Fund III obligations</span>
           </div>
-          <div style={{ position: 'absolute', left: 0, right: 0, top: 80, bottom: 0, overflow: 'hidden' }}>
-            <div ref={colRef} style={{ position: 'absolute', left: 48, right: 48, top: 0, transform: `translateY(${24 - scroll}px)` }}>
-              <div style={{ background: pillBg, borderRadius: 999, padding: '18px 30px', fontFamily: M, fontSize: 22, color: pal.ink }}>
-                Does Simon need to be given quarterly information rights?
-              </div>
-              <div style={{ opacity: reveal, transform: `translateY(${(1 - reveal) * 16}px)` }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 6px', fontFamily: M, fontSize: 17, color: pal.ink, opacity: 0.55 }}>
-                  <span style={{ width: 13, height: 16, border: `1.5px solid ${pal.ink}`, borderRadius: 3, display: 'inline-block' }} />
-                  Searched deal room · 3 documents
+
+          <div style={{ background: pillBg, borderRadius: 999, padding: '14px 26px', fontFamily: M, fontSize: 20, color: pal.ink, opacity: qIn, transform: `translateY(${(1 - qIn) * 12}px)`, marginBottom: 26 }}>
+            Does Simon need to be given quarterly information rights?
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {steps.map((step, i) => {
+              const e = ez(p, step.at, 0.06);
+              const done = e > 0.55;
+              return (
+                <div key={step.label} style={{
+                  display: 'grid', gridTemplateColumns: '110px 1fr auto', gap: 18, alignItems: 'center',
+                  padding: '14px 18px', borderRadius: 14, background: soft,
+                  opacity: e, transform: `translateY(${(1 - e) * 14}px)`,
+                  border: `1px solid ${done ? pal.accent : 'transparent'}`,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Check on={done} accent={pal.accent} />
+                    <span style={{ fontFamily: M, fontSize: 13, letterSpacing: '0.12em', color: done ? pal.accent : pal.ink, opacity: done ? 1 : 0.5 }}>{step.label}</span>
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>{step.title}</div>
+                    <div style={{ fontFamily: F, fontSize: 17, color: pal.ink, opacity: 0.75, marginTop: 3 }}>{step.detail}</div>
+                  </div>
+                  <span style={{ ...mono, fontSize: 13, opacity: 0.45, textAlign: 'right', maxWidth: 200 }}>{step.meta}</span>
                 </div>
-                <div style={{ ...body, margin: '14px 0 4px' }}>Yes — if Simon is a Major Investor under the Orange Ltd Series B suite:</div>
-                <div style={h2}>Shareholders&apos; Agreement — Information Rights</div>
-                <div style={body}>
-                  Each <strong>Major Investor</strong> is entitled to unaudited quarterly financial statements within 45 days of quarter-end, and an annual budget within 30 days of year-start.{badge('1', hover, badgeRef)}
-                </div>
-                <div style={h2}>Investor Rights Agreement — cl. 3.1</div>
-                <div style={body}>
-                  “Major Investor” means any holder of at least <strong>£250,000</strong> of Series B Preferred (or Ordinary Shares issued on conversion). Simon’s holding meets that threshold.{badge('2', false, null)}
-                </div>
-                <div style={h2}>Side Letter — inspection rights</div>
-                <div style={body}>
-                  Simon also has a contractual right to <strong>reasonable inspection</strong> of books and records on 10 business days’ notice, in addition to the quarterly pack.{badge('3', false, null)}
-                </div>
-              </div>
-              <div style={{ position: 'absolute', left: Math.max(0, bp.x - 450), top: bp.y + 22, width: 420, background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: `3px solid ${pal.accent}`, borderRadius: 12, boxShadow: '0 16px 40px rgba(16,18,21,0.18)', padding: '20px 24px', opacity: popVis, transform: `translateY(${(1 - popVis) * 10}px)`, zIndex: 20 }}>
-                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.4 }}>Orange Ltd — Series B — Shareholders&apos; Agreement.docx</div>
-                <div style={{ fontFamily: M, fontSize: 15, color: pal.accent, margin: '8px 0 10px' }}>Information Rights · quarterly reporting</div>
-                <div style={{ fontFamily: F, fontStyle: 'italic', fontSize: 16.5, lineHeight: 1.55, color: pal.ink, opacity: 0.85 }}>
-                  “The Company shall deliver to each Major Investor… unaudited quarterly financial statements within forty-five (45) days after the end of each fiscal quarter…”
-                </div>
-              </div>
-              <Cursor x={curX} y={curY} opacity={curO} />
+              );
+            })}
+          </div>
+
+          <div style={{
+            marginTop: 22, padding: '20px 24px', borderRadius: 14,
+            background: pal.dark ? 'rgba(0,156,127,0.12)' : 'rgba(0,156,127,0.08)',
+            borderLeft: `4px solid ${pal.accent}`,
+            opacity: answerIn, transform: `translateY(${(1 - answerIn) * 12}px)`,
+          }}>
+            <div style={{ fontFamily: M, fontSize: 14, letterSpacing: '0.14em', color: pal.accent, marginBottom: 10 }}>REASONING</div>
+            <div style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink, lineHeight: 1.35, marginBottom: 10 }}>
+              Yes — provide Simon the quarterly information pack.
+            </div>
+            <div style={{ fontFamily: F, fontSize: 18, color: pal.ink, opacity: 0.82, lineHeight: 1.5 }}>
+              Simon is an LP in Fund III. The LPA and his side letter both grant Major LPs unaudited quarterly financials within 45 days of quarter-end. His commitment clears the threshold, so the obligation applies.
             </div>
           </div>
         </div>
@@ -196,19 +213,21 @@
   function SAsk() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
-    const phase = p < 0.22 ? 0 : p < 0.7 ? 1 : 2;
+    // 0 quote · 1 agent trace · 2 payoff
+    const phase = p < 0.18 ? 0 : p < 0.72 ? 1 : 2;
+    const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
         {phase === 0 ? <SectionTitle p={p} num="02" text="ASK ANYTHING" /> : <Kicker p={p} at={0.02} num="02" text="ASK ANYTHING" />}
-        {phase === 0 && <Quote p={p} at={0.07} words={QUOTE} pre="Deal counsel, night before signing —" />}
-        {phase === 1 && <AnswerDoc p={p} pal={pal} />}
+        {phase === 0 && <Quote p={p} at={0.06} words={QUOTE} pre="Fund counsel asks —" />}
+        {phase === 1 && <AnswerDoc p={local(0.18, 0.72)} pal={pal} />}
         {phase === 2 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.71} size={150} color={pal.ink}>Ask.</Slam>
-            <Slam p={p} at={0.73} size={150} color={pal.ink}>Answered.</Slam>
-            <Slam p={p} at={0.75} size={150} color={pal.accent}>Cited.<span style={{ display: 'inline-block', fontFamily: M, fontStyle: 'normal', fontSize: 34, fontWeight: 400, color: pal.accent, border: `2px solid ${pal.accent}`, borderRadius: 10, padding: '2px 18px', marginLeft: 26, verticalAlign: '18px' }}>1</span></Slam>
+            <Slam p={p} at={0.74} size={150} color={pal.ink}>Ask.</Slam>
+            <Slam p={p} at={0.76} size={150} color={pal.ink}>Answered.</Slam>
+            <Slam p={p} at={0.78} size={150} color={pal.accent}>Cited.<span style={{ display: 'inline-block', fontFamily: M, fontStyle: 'normal', fontSize: 34, fontWeight: 400, color: pal.accent, border: `2px solid ${pal.accent}`, borderRadius: 10, padding: '2px 18px', marginLeft: 26, verticalAlign: '18px' }}>1</span></Slam>
             <div style={{ marginTop: 52 }}>
-              <KpiFlip p={p} at={0.8} label="Deal question" from="2 hrs" to="4 min" />
+              <KpiFlip p={p} at={0.82} label="Deal question" from="2 hrs" to="4 min" />
             </div>
           </div>
         )}
