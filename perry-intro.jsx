@@ -401,9 +401,8 @@
   }
 
   const PORTFOLIO_PREFS = [
-    { co: 'Orange Ltd', doc: 'Series A AoA', term: 'Participating, as-converted', hot: false },
-    { co: 'Grape Ltd', doc: 'Seed AoA', term: '1× non-participating', hot: true },
-    { co: 'Mango Ltd', doc: 'Series A AoA', term: 'Multi-tranche waterfall · 1.2×', hot: false },
+    { co: 'Orange Ltd', doc: 'Series A AoA', term: '1.5× senior preference', hot: true },
+    { co: 'Grape Ltd', doc: 'Seed AoA', term: '1.5× senior preference', hot: true },
   ];
   function SPatterns() {
     const { progress: p } = useScene();
