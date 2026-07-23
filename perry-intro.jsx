@@ -69,11 +69,13 @@
     const logoPop = ez(p, 0.03, 0.1, Easing.easeOutBack);
     const rule = ez(p, 0.16, 0.05);
     const line = ez(p, 0.22, 0.05);
+    const site = ez(p, 0.32, 0.05);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <img src="assets/perry-logo.png" alt="Perry" style={{ width: 620, opacity: logo, transform: `scale(${0.85 + 0.15 * logoPop})`, filter: pal.dark ? 'invert(1)' : 'none' }} />
-        <div style={{ height: 4, width: 460 * rule, background: pal.accent, borderRadius: 2, margin: '46px 0 34px' }} />
-        <div style={{ fontFamily: T, fontWeight: 600, fontSize: 54, color: pal.accent, opacity: line, transform: `translateY(${(1 - line) * 14}px)` }}>Meet the legal OS.</div>
+        <div style={{ height: 4, width: 520 * rule, background: pal.accent, borderRadius: 2, margin: '46px 0 34px' }} />
+        <div style={{ fontFamily: T, fontWeight: 600, fontSize: 48, color: pal.accent, opacity: line, transform: `translateY(${(1 - line) * 14}px)`, textAlign: 'center' }}>Meet the legal OS for private capital</div>
+        <div style={{ fontFamily: M, fontSize: 28, letterSpacing: '0.14em', color: pal.ink, opacity: site * 0.85, transform: `translateY(${(1 - site) * 12}px)`, marginTop: 28 }}>useperry.com</div>
       </div>
     );
   }
