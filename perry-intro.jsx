@@ -153,36 +153,49 @@
             </div>
           </div>
 
-          <div style={{ position: 'relative', padding: '8px 0 4px' }}>
-            <div style={{ position: 'absolute', left: 70, right: 70, top: 36, height: 3, background: track, borderRadius: 2 }} />
-            <div style={{ position: 'absolute', left: 70, top: 36, height: 3, width: `calc((100% - 140px) * ${pipeFill})`, background: pal.accent, borderRadius: 2, transition: 'none' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, position: 'relative' }}>
-              {steps.map((s, i) => {
+          <div style={{ position: 'relative', paddingTop: 4 }}>
+            <div style={{ position: 'relative', height: 44, marginBottom: 14 }}>
+              <div style={{ position: 'absolute', left: '12.5%', right: '12.5%', top: 20, height: 3, background: track, borderRadius: 2 }} />
+              <div style={{ position: 'absolute', left: '12.5%', top: 20, height: 3, width: `${pipeFill * 75}%`, background: pal.accent, borderRadius: 2 }} />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 28, height: 44, position: 'relative' }}>
+                {steps.map((s) => {
+                  const e = ez(p, s.at, 0.07);
+                  const on = e > 0.55;
+                  const active = e > 0.15 && e <= 0.55;
+                  return (
+                    <div key={s.label + '-node'} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 20, zIndex: 1,
+                        background: on ? pal.accent : cardBg,
+                        border: `2px solid ${on || active ? pal.accent : track}`,
+                        color: on ? '#fff' : (active ? pal.accent : pal.ink),
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: M, fontSize: 13, fontWeight: 500,
+                        boxShadow: on ? `0 0 0 4px ${pal.dark ? 'rgba(0,156,127,0.16)' : 'rgba(0,156,127,0.1)'}` : 'none',
+                      }}>
+                        {on ? (
+                          <svg width="15" height="12" viewBox="0 0 13 11"><polyline points="1.5,5.5 5,9 11.5,1.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        ) : s.n}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 28 }}>
+              {steps.map((s) => {
                 const e = ez(p, s.at, 0.07);
                 const on = e > 0.55;
-                const active = e > 0.15 && e <= 0.55;
                 return (
-                  <div key={s.label} style={{ opacity: Math.max(0.35, e), transform: `translateY(${(1 - e) * 16}px)`, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div key={s.label} style={{ minWidth: 0, opacity: Math.max(0.35, e), transform: `translateY(${(1 - e) * 12}px)` }}>
+                    <div style={{ ...mono, fontSize: 12, letterSpacing: '0.16em', color: on ? pal.accent : pal.ink, opacity: on ? 1 : 0.45, marginBottom: 10, textAlign: 'center' }}>{s.label}</div>
                     <div style={{
-                      width: 44, height: 44, borderRadius: 22, marginBottom: 16, zIndex: 1,
-                      background: on ? pal.accent : cardBg,
-                      border: `2px solid ${on || active ? pal.accent : track}`,
-                      color: on ? '#fff' : (active ? pal.accent : pal.ink),
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: M, fontSize: 14, fontWeight: 500,
-                      boxShadow: on ? `0 0 0 6px ${pal.dark ? 'rgba(0,156,127,0.18)' : 'rgba(0,156,127,0.12)'}` : 'none',
-                    }}>
-                      {on ? (
-                        <svg width="16" height="13" viewBox="0 0 13 11"><polyline points="1.5,5.5 5,9 11.5,1.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                      ) : s.n}
-                    </div>
-                    <div style={{ ...mono, fontSize: 13, letterSpacing: '0.16em', color: on ? pal.accent : pal.ink, opacity: on ? 1 : 0.45, marginBottom: 8 }}>{s.label}</div>
-                    <div style={{
-                      width: '100%', minHeight: 132, background: on ? (pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.06)') : pillBg,
+                      boxSizing: 'border-box', width: '100%', minHeight: 140,
+                      background: on ? (pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.06)') : pillBg,
                       border: `1px solid ${on ? pal.accent : cardBorder}`, borderRadius: 14, padding: '16px 14px',
                     }}>
-                      <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.25, marginBottom: 8 }}>{s.title}</div>
-                      <div style={{ ...mono, fontSize: 13, opacity: 0.55, lineHeight: 1.45 }}>{s.detail}</div>
+                      <div style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink, lineHeight: 1.25, marginBottom: 8 }}>{s.title}</div>
+                      <div style={{ ...mono, fontSize: 12, opacity: 0.55, lineHeight: 1.45 }}>{s.detail}</div>
                     </div>
                   </div>
                 );
