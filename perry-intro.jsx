@@ -118,50 +118,88 @@
     const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
-    const soft = pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.06)';
-    const mono = { fontFamily: M, fontSize: 16, color: pal.ink };
+    const track = pal.dark ? 'rgba(242,239,232,0.12)' : 'rgba(16,18,21,0.1)';
+    const mono = { fontFamily: M, fontSize: 15, color: pal.ink };
     const cardIn = ez(p, 0.02, 0.08);
     const qIn = ez(p, 0.1, 0.06);
+    const outIn = ez(p, 0.86, 0.06);
     const steps = [
-      { at: 0.2, label: 'IDENTIFY', title: 'Simon Chen — LP / Major Investor', detail: 'Orange Ltd · Series B · holds above £250k threshold' },
-      { at: 0.38, label: 'LOCATE', title: 'Governing instruments found', detail: 'Side Letter · LPA schedule · Investor Rights Agreement' },
-      { at: 0.56, label: 'CHECK', title: 'Information rights clause', detail: 'SHA §4.2 · IRA cl. 3.1 · quarterly pack within 45 days' },
-      { at: 0.74, label: 'REASON', title: 'Answer ready with citations', detail: 'Threshold met → quarterly information rights apply' },
+      { at: 0.2, n: '01', label: 'IDENTIFY', title: 'Who is Simon?', detail: 'LP / Major Investor · Orange Ltd Series B · above £250k' },
+      { at: 0.38, n: '02', label: 'LOCATE', title: 'Find the docs', detail: 'Side Letter · LPA schedule · Investor Rights Agreement' },
+      { at: 0.56, n: '03', label: 'CHECK', title: 'Read the clause', detail: 'SHA §4.2 · IRA cl. 3.1 · quarterly pack in 45 days' },
+      { at: 0.74, n: '04', label: 'REASON', title: 'Decide + cite', detail: 'Threshold met → quarterly information rights apply' },
     ];
+    const doneCount = steps.reduce((n, s) => n + (ez(p, s.at, 0.07) > 0.55 ? 1 : 0), 0);
+    const pipeFill = clamp((doneCount - 1) / (steps.length - 1), 0, 1);
     return (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 1120, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 40px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 36}px) scale(${0.96 + 0.04 * cardIn})` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22 }}>
+        <div style={{ width: 1240, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 44px 40px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 36}px) scale(${0.96 + 0.04 * cardIn})` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
             <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
             <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>AGENT</span>
+            <span style={{ ...mono, fontSize: 14, opacity: 0.45, marginLeft: 8 }}>workflow</span>
             <span style={{ flex: 1 }} />
             <span style={{ ...mono, fontSize: 14, color: pal.accent, opacity: ez(p, 0.12, 0.05) }}>running · deal room</span>
           </div>
-          <div style={{ background: pillBg, borderRadius: 14, padding: '16px 22px', opacity: qIn, transform: `translateY(${(1 - qIn) * 12}px)`, marginBottom: 26 }}>
-            <div style={{ ...mono, fontSize: 13, opacity: 0.5, marginBottom: 6, letterSpacing: '0.12em' }}>INCOMING QUERY</div>
-            <div style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink }}>Does Simon need to be given quarterly information rights?</div>
+
+          <div style={{ display: 'flex', alignItems: 'stretch', gap: 18, marginBottom: 34, opacity: qIn, transform: `translateY(${(1 - qIn) * 12}px)` }}>
+            <div style={{ width: 110, flexShrink: 0, borderRadius: 12, background: pal.accent, color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '14px 10px' }}>
+              <span style={{ fontFamily: M, fontSize: 12, letterSpacing: '0.16em', opacity: 0.85 }}>INPUT</span>
+              <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18 }}>Query</span>
+            </div>
+            <div style={{ flex: 1, background: pillBg, borderRadius: 14, padding: '18px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ ...mono, fontSize: 13, opacity: 0.5, marginBottom: 6, letterSpacing: '0.12em' }}>INCOMING QUERY</div>
+              <div style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink }}>Does Simon need to be given quarterly information rights?</div>
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {steps.map((s, i) => {
-              const e = ez(p, s.at, 0.07);
-              const on = e > 0.55;
-              return (
-                <div key={s.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, opacity: e, transform: `translateY(${(1 - e) * 14}px)`, padding: '14px 16px', borderRadius: 12, background: on ? (pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.06)') : soft }}>
-                  <Check on={on} accent={pal.accent} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
-                      <span style={{ ...mono, fontSize: 13, letterSpacing: '0.16em', color: pal.accent }}>{s.label}</span>
-                      <span style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>{s.title}</span>
+
+          <div style={{ position: 'relative', padding: '8px 0 4px' }}>
+            <div style={{ position: 'absolute', left: 70, right: 70, top: 36, height: 3, background: track, borderRadius: 2 }} />
+            <div style={{ position: 'absolute', left: 70, top: 36, height: 3, width: `calc((100% - 140px) * ${pipeFill})`, background: pal.accent, borderRadius: 2, transition: 'none' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, position: 'relative' }}>
+              {steps.map((s, i) => {
+                const e = ez(p, s.at, 0.07);
+                const on = e > 0.55;
+                const active = e > 0.15 && e <= 0.55;
+                return (
+                  <div key={s.label} style={{ opacity: Math.max(0.35, e), transform: `translateY(${(1 - e) * 16}px)`, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 22, marginBottom: 16, zIndex: 1,
+                      background: on ? pal.accent : cardBg,
+                      border: `2px solid ${on || active ? pal.accent : track}`,
+                      color: on ? '#fff' : (active ? pal.accent : pal.ink),
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontFamily: M, fontSize: 14, fontWeight: 500,
+                      boxShadow: on ? `0 0 0 6px ${pal.dark ? 'rgba(0,156,127,0.18)' : 'rgba(0,156,127,0.12)'}` : 'none',
+                    }}>
+                      {on ? (
+                        <svg width="16" height="13" viewBox="0 0 13 11"><polyline points="1.5,5.5 5,9 11.5,1.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      ) : s.n}
                     </div>
-                    <div style={{ ...mono, fontSize: 15, opacity: 0.55 }}>{s.detail}</div>
+                    <div style={{ ...mono, fontSize: 13, letterSpacing: '0.16em', color: on ? pal.accent : pal.ink, opacity: on ? 1 : 0.45, marginBottom: 8 }}>{s.label}</div>
+                    <div style={{
+                      width: '100%', minHeight: 132, background: on ? (pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.06)') : pillBg,
+                      border: `1px solid ${on ? pal.accent : cardBorder}`, borderRadius: 14, padding: '16px 14px',
+                    }}>
+                      <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.25, marginBottom: 8 }}>{s.title}</div>
+                      <div style={{ ...mono, fontSize: 13, opacity: 0.55, lineHeight: 1.45 }}>{s.detail}</div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 26, opacity: ez(p, 0.86, 0.06) }}>
-            <span style={{ width: 8, height: 8, borderRadius: 4, background: pal.accent }} />
-            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>Composing cited answer…</span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 32, opacity: outIn, transform: `translateY(${(1 - outIn) * 12}px)` }}>
+            <div style={{ width: 110, flexShrink: 0, borderRadius: 12, border: `1.5px solid ${pal.accent}`, color: pal.accent, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 10px' }}>
+              <span style={{ fontFamily: M, fontSize: 12, letterSpacing: '0.16em' }}>OUTPUT</span>
+              <span style={{ fontFamily: F, fontWeight: 600, fontSize: 17 }}>Answer</span>
+            </div>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ width: 8, height: 8, borderRadius: 4, background: pal.accent }} />
+              <span style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>Composing cited answer…</span>
+              <span style={{ ...mono, fontSize: 14, opacity: 0.5 }}>handing off to Assistant</span>
+            </div>
           </div>
         </div>
       </div>
