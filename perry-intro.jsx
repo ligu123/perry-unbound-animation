@@ -118,101 +118,114 @@
     const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
-    const track = pal.dark ? 'rgba(242,239,232,0.12)' : 'rgba(16,18,21,0.1)';
+    const codeBg = pal.dark ? 'rgba(242,239,232,0.05)' : '#F7F8F7';
     const mono = { fontFamily: M, fontSize: 15, color: pal.ink };
     const cardIn = ez(p, 0.02, 0.08);
     const qIn = ez(p, 0.1, 0.06);
     const outIn = ez(p, 0.86, 0.06);
-    const steps = [
-      { at: 0.2, n: '01', label: 'IDENTIFY', title: 'Who is Simon?', detail: 'LP / Major Investor · Orange Ltd Series B · above £250k' },
-      { at: 0.38, n: '02', label: 'LOCATE', title: 'Find the docs', detail: 'Side Letter · LPA schedule · Investor Rights Agreement' },
-      { at: 0.56, n: '03', label: 'CHECK', title: 'Read the clause', detail: 'SHA §4.2 · IRA cl. 3.1 · quarterly pack in 45 days' },
-      { at: 0.74, n: '04', label: 'REASON', title: 'Decide + cite', detail: 'Threshold met → quarterly information rights apply' },
+    const tools = [
+      {
+        at: 0.18,
+        name: 'lookup_party',
+        args: '{ name: "Simon", company: "Orange Ltd" }',
+        result: '{ role: "Major Investor", holding: "£250k+", series: "B" }',
+      },
+      {
+        at: 0.36,
+        name: 'search_deal_room',
+        args: '{ query: "information rights", party: "Simon" }',
+        result: '{ docs: ["SHA", "IRA", "Side Letter"], hits: 3 }',
+      },
+      {
+        at: 0.54,
+        name: 'read_clause',
+        args: '{ doc: "SHA", section: "4.2" }',
+        result: '{ entitlement: "quarterly pack", days: 45 }',
+      },
+      {
+        at: 0.72,
+        name: 'cite_and_decide',
+        args: '{ threshold: "Major Investor", met: true }',
+        result: '{ answer: "Yes", citations: [1, 2, 3] }',
+      },
     ];
-    const doneCount = steps.reduce((n, s) => n + (ez(p, s.at, 0.07) > 0.55 ? 1 : 0), 0);
-    const pipeFill = clamp((doneCount - 1) / (steps.length - 1), 0, 1);
     return (
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 1240, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 44px 40px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 36}px) scale(${0.96 + 0.04 * cardIn})` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '118px 56px 36px' }}>
+        <div style={{
+          width: 1180, maxHeight: '100%', background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
+          boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '28px 40px 32px',
+          opacity: cardIn, transform: `translateY(${(1 - cardIn) * 36}px) scale(${0.96 + 0.04 * cardIn})`,
+          display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18, flexShrink: 0 }}>
             <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
             <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>AGENT</span>
-            <span style={{ ...mono, fontSize: 14, opacity: 0.45, marginLeft: 8 }}>workflow</span>
+            <span style={{ ...mono, fontSize: 14, opacity: 0.45, marginLeft: 4 }}>tool calls</span>
             <span style={{ flex: 1 }} />
             <span style={{ ...mono, fontSize: 14, color: pal.accent, opacity: ez(p, 0.12, 0.05) }}>running · deal room</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'stretch', gap: 18, marginBottom: 34, opacity: qIn, transform: `translateY(${(1 - qIn) * 12}px)` }}>
-            <div style={{ width: 110, flexShrink: 0, borderRadius: 12, background: pal.accent, color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '14px 10px' }}>
-              <span style={{ fontFamily: M, fontSize: 12, letterSpacing: '0.16em', opacity: 0.85 }}>INPUT</span>
-              <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18 }}>Query</span>
-            </div>
-            <div style={{ flex: 1, background: pillBg, borderRadius: 14, padding: '18px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <div style={{ ...mono, fontSize: 13, opacity: 0.5, marginBottom: 6, letterSpacing: '0.12em' }}>INCOMING QUERY</div>
-              <div style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink }}>Does Simon need to be given quarterly information rights?</div>
-            </div>
+          <div style={{
+            background: pillBg, borderRadius: 12, padding: '14px 20px', marginBottom: 16, flexShrink: 0,
+            opacity: qIn, transform: `translateY(${(1 - qIn) * 12}px)`,
+          }}>
+            <div style={{ ...mono, fontSize: 12, opacity: 0.5, marginBottom: 4, letterSpacing: '0.12em' }}>USER</div>
+            <div style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>Does Simon need to be given quarterly information rights?</div>
           </div>
 
-          <div style={{ position: 'relative', paddingTop: 4 }}>
-            <div style={{ position: 'relative', height: 44, marginBottom: 14 }}>
-              <div style={{ position: 'absolute', left: '12.5%', right: '12.5%', top: 20, height: 3, background: track, borderRadius: 2 }} />
-              <div style={{ position: 'absolute', left: '12.5%', top: 20, height: 3, width: `${pipeFill * 75}%`, background: pal.accent, borderRadius: 2 }} />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 28, height: 44, position: 'relative' }}>
-                {steps.map((s) => {
-                  const e = ez(p, s.at, 0.07);
-                  const on = e > 0.55;
-                  const active = e > 0.15 && e <= 0.55;
-                  return (
-                    <div key={s.label + '-node'} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <div style={{
-                        width: 40, height: 40, borderRadius: 20, zIndex: 1,
-                        background: on ? pal.accent : cardBg,
-                        border: `2px solid ${on || active ? pal.accent : track}`,
-                        color: on ? '#fff' : (active ? pal.accent : pal.ink),
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontFamily: M, fontSize: 13, fontWeight: 500,
-                        boxShadow: on ? `0 0 0 4px ${pal.dark ? 'rgba(0,156,127,0.16)' : 'rgba(0,156,127,0.1)'}` : 'none',
-                      }}>
-                        {on ? (
-                          <svg width="15" height="12" viewBox="0 0 13 11"><polyline points="1.5,5.5 5,9 11.5,1.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                        ) : s.n}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            {tools.map((t, i) => {
+              const e = ez(p, t.at, 0.08);
+              const calling = e > 0.15 && e < 0.55;
+              const done = e >= 0.55;
+              const resultIn = ez(p, t.at + 0.05, 0.06);
+              return (
+                <div key={t.name} style={{
+                  border: `1px solid ${done || calling ? pal.accent : cardBorder}`,
+                  borderRadius: 12, overflow: 'hidden',
+                  opacity: Math.max(0.2, e),
+                  transform: `translateY(${(1 - e) * 14}px)`,
+                  background: done ? (pal.dark ? 'rgba(0,156,127,0.06)' : 'rgba(0,156,127,0.04)') : cardBg,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderBottom: `1px solid ${cardBorder}` }}>
+                    <span style={{
+                      fontFamily: M, fontSize: 11, letterSpacing: '0.1em', borderRadius: 999, padding: '3px 9px',
+                      color: done ? '#fff' : (calling ? pal.accent : pal.ink),
+                      background: done ? pal.accent : (calling ? (pal.dark ? 'rgba(0,156,127,0.16)' : 'rgba(0,156,127,0.1)') : pillBg),
+                      opacity: done || calling ? 1 : 0.5,
+                    }}>{done ? 'DONE' : calling ? 'CALLING' : 'QUEUED'}</span>
+                    <span style={{ fontFamily: M, fontSize: 16, color: pal.ink }}>
+                      <span style={{ opacity: 0.45 }}>tool.</span>
+                      <span style={{ color: pal.accent, fontWeight: 500 }}>{t.name}</span>
+                      <span style={{ opacity: 0.45 }}>()</span>
+                    </span>
+                    <span style={{ flex: 1 }} />
+                    <span style={{ ...mono, fontSize: 12, opacity: 0.4 }}>#{i + 1}</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                    <div style={{ padding: '10px 14px', borderRight: `1px solid ${cardBorder}`, background: codeBg }}>
+                      <div style={{ ...mono, fontSize: 11, letterSpacing: '0.12em', opacity: 0.45, marginBottom: 6 }}>ARGS</div>
+                      <div style={{ fontFamily: M, fontSize: 13, color: pal.ink, lineHeight: 1.45, opacity: 0.85 }}>{t.args}</div>
+                    </div>
+                    <div style={{ padding: '10px 14px', background: done ? (pal.dark ? 'rgba(0,156,127,0.08)' : 'rgba(0,156,127,0.05)') : codeBg, opacity: Math.max(0.35, resultIn) }}>
+                      <div style={{ ...mono, fontSize: 11, letterSpacing: '0.12em', color: done ? pal.accent : pal.ink, opacity: done ? 1 : 0.45, marginBottom: 6 }}>RESULT</div>
+                      <div style={{ fontFamily: M, fontSize: 13, color: done ? pal.accent : pal.ink, lineHeight: 1.45, opacity: done ? 0.95 : 0.5 }}>
+                        {done || calling ? t.result : '{ … }'}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 28 }}>
-              {steps.map((s) => {
-                const e = ez(p, s.at, 0.07);
-                const on = e > 0.55;
-                return (
-                  <div key={s.label} style={{ minWidth: 0, opacity: Math.max(0.35, e), transform: `translateY(${(1 - e) * 12}px)` }}>
-                    <div style={{ ...mono, fontSize: 12, letterSpacing: '0.16em', color: on ? pal.accent : pal.ink, opacity: on ? 1 : 0.45, marginBottom: 10, textAlign: 'center' }}>{s.label}</div>
-                    <div style={{
-                      boxSizing: 'border-box', width: '100%', minHeight: 140,
-                      background: on ? (pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.06)') : pillBg,
-                      border: `1px solid ${on ? pal.accent : cardBorder}`, borderRadius: 14, padding: '16px 14px',
-                    }}>
-                      <div style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink, lineHeight: 1.25, marginBottom: 8 }}>{s.title}</div>
-                      <div style={{ ...mono, fontSize: 12, opacity: 0.55, lineHeight: 1.45 }}>{s.detail}</div>
-                    </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 32, opacity: outIn, transform: `translateY(${(1 - outIn) * 12}px)` }}>
-            <div style={{ width: 110, flexShrink: 0, borderRadius: 12, border: `1.5px solid ${pal.accent}`, color: pal.accent, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 10px' }}>
-              <span style={{ fontFamily: M, fontSize: 12, letterSpacing: '0.16em' }}>OUTPUT</span>
-              <span style={{ fontFamily: F, fontWeight: 600, fontSize: 17 }}>Answer</span>
-            </div>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ width: 8, height: 8, borderRadius: 4, background: pal.accent }} />
-              <span style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>Composing cited answer…</span>
-              <span style={{ ...mono, fontSize: 14, opacity: 0.5 }}>handing off to Assistant</span>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 16, opacity: outIn, transform: `translateY(${(1 - outIn) * 12}px)`, flexShrink: 0 }}>
+            <span style={{
+              fontFamily: M, fontSize: 12, letterSpacing: '0.12em', color: pal.accent,
+              border: `1.5px solid ${pal.accent}`, borderRadius: 999, padding: '7px 14px',
+            }}>RETURN</span>
+            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>Cited answer ready</span>
+            <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>→ handoff to Assistant</span>
           </div>
         </div>
       </div>
@@ -345,6 +358,84 @@
     );
   }
 
+  function NdaCustomize({ p }) {
+    const pal = React.useContext(Pal);
+    const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
+    const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
+    const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
+    const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
+    const shell = ez(p, 0.04, 0.08);
+    const titleIn = ez(p, 0.1, 0.07);
+    const rules = [
+      { id: '04', title: 'Term cap', detail: 'Confidentiality ≤ two (2) years', at: 0.28 },
+      { id: '07', title: 'Governing law', detail: 'England and Wales only', at: 0.38 },
+      { id: '09', title: 'Mutual form', detail: 'Reject one-way NDAs', at: 0.48 },
+      { id: '11', title: 'Residual info', detail: 'No residual knowledge clause', at: 0.58 },
+    ];
+    const done = ez(p, 0.72, 0.08);
+    return (
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, padding: '0 80px' }}>
+        <div style={{
+          width: 1080, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
+          boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 40px',
+          opacity: shell, transform: `translateY(${(1 - shell) * 36}px)`,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22 }}>
+            <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
+            <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>PLAYBOOK</span>
+            <span style={{ flex: 1 }} />
+            <span style={{ ...mono, fontSize: 14, opacity: 0.5 }}>NDA review · customised for your fund</span>
+          </div>
+          <div style={{ opacity: titleIn, transform: `translateY(${(1 - titleIn) * 14}px)` }}>
+            <div style={{ fontFamily: T, fontWeight: 600, fontSize: 42, color: pal.ink, lineHeight: 1.15, marginBottom: 12 }}>
+              We customise the NDA rules <span style={{ color: pal.accent }}>with your team</span>
+            </div>
+            <div style={{ fontFamily: F, fontSize: 20, lineHeight: 1.45, color: pal.ink, opacity: 0.72, maxWidth: 820, marginBottom: 28 }}>
+              Sit with counsel once. Encode your negotiated positions. Every NDA after that reviews against your playbook — not a generic checklist.
+            </div>
+          </div>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 12, marginBottom: 18,
+            background: pal.dark ? 'rgba(0,156,127,0.12)' : 'rgba(0,156,127,0.08)', border: `1px solid ${pal.accent}`,
+            opacity: ez(p, 0.2, 0.06),
+          }}>
+            <span style={{ fontFamily: M, fontSize: 13, letterSpacing: '0.12em', color: pal.accent }}>WORKSHOP</span>
+            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink }}>Perry × Company counsel · Fund NDA playbook</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {rules.map((r) => {
+              const e = ez(p, r.at, 0.07);
+              return (
+                <div key={r.id} style={{
+                  display: 'flex', alignItems: 'center', gap: 16, padding: '14px 18px', borderRadius: 12,
+                  background: pillBg, border: `1px solid ${e > 0.55 ? pal.accent : cardBorder}`,
+                  opacity: e, transform: `translateY(${(1 - e) * 12}px)`,
+                }}>
+                  <span style={{
+                    width: 42, height: 42, borderRadius: 10, flexShrink: 0, background: e > 0.55 ? pal.accent : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)'),
+                    color: e > 0.55 ? '#fff' : pal.ink, fontFamily: M, fontSize: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  }}>{r.id}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: F, fontWeight: 600, fontSize: 19, color: pal.ink }}>{r.title}</div>
+                    <div style={{ ...mono, fontSize: 14, opacity: 0.55, marginTop: 3 }}>{r.detail}</div>
+                  </div>
+                  <Check on={e > 0.65} accent={pal.accent} />
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 24, opacity: done }}>
+            <Check on={done > 0.55} accent={pal.accent} />
+            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>12 rules live — investment team unblocked on every NDA</span>
+          </div>
+        </div>
+        <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.8, 0.06), textAlign: 'center' }}>
+          Your positions. <span style={{ color: pal.accent }}>Encoded once. Applied every time.</span>
+        </div>
+      </div>
+    );
+  }
+
   function SNda() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
@@ -352,19 +443,26 @@
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
     const soft = pal.dark ? 'rgba(242,239,232,0.08)' : 'rgba(16,18,21,0.06)';
-    const phase = p < 0.12 ? 0 : p < 0.56 ? 1 : p < 0.8 ? 2 : 3;
-    const flowIn = ez(p, 0.13, 0.05);
-    const step1 = ez(p, 0.16, 0.06);
-    const step2 = ez(p, 0.23, 0.06);
-    const chanE = ez(p, 0.27, 0.05);
-    const chanS = ez(p, 0.3, 0.05);
-    const step3 = ez(p, 0.34, 0.06);
-    const arrow1 = ez(p, 0.21, 0.04);
-    const arrow2 = ez(p, 0.32, 0.04);
-    const docIn = ez(p, 0.58, 0.06);
-    const strike1 = ez(p, 0.64, 0.05);
-    const strike2 = ez(p, 0.69, 0.05);
-    const backIn = ez(p, 0.735, 0.06);
+    // 0 hook · 1 customise playbook · 2 three-step flow · 3 redline + issues · 4 payoff
+    const phase = p < 0.09 ? 0 : p < 0.3 ? 1 : p < 0.54 ? 2 : p < 0.82 ? 3 : 4;
+    const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
+    const fp = local(0.3, 0.54);
+    const rp = local(0.54, 0.82);
+    const flowIn = ez(fp, 0.04, 0.1);
+    const step1 = ez(fp, 0.1, 0.12);
+    const step2 = ez(fp, 0.28, 0.12);
+    const chanE = ez(fp, 0.38, 0.1);
+    const chanS = ez(fp, 0.48, 0.1);
+    const step3 = ez(fp, 0.55, 0.12);
+    const arrow1 = ez(fp, 0.22, 0.08);
+    const arrow2 = ez(fp, 0.48, 0.08);
+    const docIn = ez(rp, 0.04, 0.12);
+    const panelIn = ez(rp, 0.12, 0.12);
+    const strike1 = ez(rp, 0.22, 0.12);
+    const issue1 = ez(rp, 0.24, 0.12);
+    const strike2 = ez(rp, 0.48, 0.12);
+    const issue2 = ez(rp, 0.5, 0.12);
+    const backIn = ez(rp, 0.72, 0.12);
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
     const MailIcon = ({ size = 22 }) => (
       <svg width={size} height={size * 0.82} viewBox="0 0 22 18"><rect x="1" y="1" width="20" height="16" rx="2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" /><polyline points="1.5,2.5 11,10 20.5,2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" strokeLinejoin="round" /></svg>
@@ -384,9 +482,9 @@
     );
     const StepCard = ({ opacity, y, num, title, children }) => (
       <div style={{
-        width: 300, minHeight: 280, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
-        boxShadow: '0 18px 44px rgba(16,18,21,0.08)', padding: '26px 24px 28px',
-        opacity, transform: `translateY(${(1 - y) * 28}px)`, display: 'flex', flexDirection: 'column', gap: 16,
+        width: 318, minHeight: 340, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
+        boxShadow: '0 18px 44px rgba(16,18,21,0.08)', padding: '24px 22px 26px',
+        opacity, transform: `translateY(${(1 - y) * 28}px)`, display: 'flex', flexDirection: 'column', gap: 14,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ width: 34, height: 34, borderRadius: 17, background: pal.accent, color: '#fff', fontFamily: M, fontSize: 16, fontWeight: 500, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{num}</span>
@@ -399,7 +497,8 @@
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
         {phase === 0 ? <SectionTitle p={p} num="03" text="NDA AUTOMATION" /> : <Kicker p={p} at={0} num="03" text="NDA AUTOMATION" />}
         {phase === 0 && <HookLines p={p} l1="Another NDA just landed." l2="It's the ninth this week." />}
-        {phase === 1 && (
+        {phase === 1 && <NdaCustomize p={local(0.09, 0.3)} />}
+        {phase === 2 && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, opacity: flowIn }}>
             <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', gap: 0 }}>
               <StepCard opacity={step1} y={step1} num="1" title="FUND RECEIVES">
@@ -435,73 +534,173 @@
               </StepCard>
               <FlowArrow opacity={arrow2} />
               <StepCard opacity={step3} y={step3} num="3" title="PERRY RETURNS">
-                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 24, color: pal.ink, lineHeight: 1.25 }}>Review, redline, send back</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 4 }}>
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink, lineHeight: 1.25 }}>Reviews on your custom rules</div>
+                <div style={{
+                  marginTop: 2, padding: '10px 12px', borderRadius: 10, background: pal.dark ? 'rgba(0,156,127,0.12)' : 'rgba(0,156,127,0.08)',
+                  border: `1px solid ${pal.accent}`, opacity: ez(fp, 0.62, 0.08),
+                }}>
+                  <div style={{ ...mono, fontSize: 12, letterSpacing: '0.12em', color: pal.accent, marginBottom: 4 }}>RULE SET · BUILT WITH YOUR TEAM</div>
+                  <div style={{ fontFamily: F, fontWeight: 600, fontSize: 15, color: pal.ink, lineHeight: 1.3 }}>Fund NDA playbook · 12 rules</div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 2 }}>
                   {[
-                    ['Reviews against NDA rules', true],
-                    ['Applies tracked redlines', true],
+                    ['Applies your negotiated positions', true],
+                    ['Redlines — no wait on counsel', true],
                     ['Returns draft to the fund', true],
                   ].map(([t, on], i) => {
-                    const e = ez(p, 0.36 + i * 0.025, 0.04);
+                    const e = ez(fp, 0.68 + i * 0.06, 0.08);
                     return (
                       <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: e, transform: `translateY(${(1 - e) * 10}px)` }}>
                         <Check on={on && e > 0.55} accent={pal.accent} />
-                        <span style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink }}>{t}</span>
+                        <span style={{ fontFamily: F, fontWeight: 600, fontSize: 16, color: pal.ink }}>{t}</span>
                       </div>
                     );
                   })}
                 </div>
-                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, opacity: ez(p, 0.42, 0.04) }}>
+                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, opacity: ez(fp, 0.86, 0.08) }}>
                   <img src="assets/perry-logo.png" alt="Perry" style={{ height: 18, filter: pal.dark ? 'invert(1)' : 'none' }} />
-                  <span style={{ ...mono, fontSize: 14, opacity: 0.5 }}>agent running</span>
+                  <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>investment team unblocked</span>
                 </div>
               </StepCard>
             </div>
-            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.4, 0.035) }}>
-              Inbox in. Redline out. <span style={{ color: pal.accent }}>No new tool to open.</span>
-            </div>
-          </div>
-        )}
-        {phase === 2 && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18 }}>
-            <div style={{ width: 900, display: 'flex', alignItems: 'center', opacity: docIn }}>
-              <span style={{ ...mono, opacity: 0.6 }}>Acme_Mutual_NDA_v3_redline.docx</span>
-              <span style={{ flex: 1 }} />
-              <span style={{ fontFamily: M, fontSize: 15, color: '#fff', background: '#C43D3D', borderRadius: 999, padding: '5px 14px' }}>2 tracked changes</span>
-            </div>
-            <div style={{ width: 900, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 10, boxShadow: '0 24px 60px rgba(16,18,21,0.12)', padding: '48px 72px 52px', opacity: docIn, transform: `translateY(${(1 - docIn) * 40}px)` }}>
-              <div style={{ fontFamily: T, fontWeight: 600, fontSize: 23, letterSpacing: '0.08em', textAlign: 'center', color: pal.ink, marginBottom: 30 }}>MUTUAL NON-DISCLOSURE AGREEMENT</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 26 }}>
-                {[100, 94, 62].map((w, i) => <div key={i} style={{ height: 9, width: `${w}%`, borderRadius: 5, background: pal.ink, opacity: 0.1 }} />)}
-              </div>
-              <div style={{ position: 'relative', fontFamily: T, fontSize: 20, lineHeight: 1.75, color: pal.ink }}>
-                <span style={{ position: 'absolute', left: -30, top: 4, bottom: 4, width: 3, background: pal.accent, opacity: strike1 }} />
-                <strong>3. Term.</strong> This Agreement shall remain in force for a period of <Redline strike={strike1} to="two (2) years" accent={pal.accent}>five (5) years</Redline> from the Effective Date, unless earlier terminated in accordance with clause 8.
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9, margin: '26px 0' }}>
-                {[97, 88].map((w, i) => <div key={i} style={{ height: 9, width: `${w}%`, borderRadius: 5, background: pal.ink, opacity: 0.1 }} />)}
-              </div>
-              <div style={{ position: 'relative', fontFamily: T, fontSize: 20, lineHeight: 1.75, color: pal.ink }}>
-                <span style={{ position: 'absolute', left: -30, top: 4, bottom: 4, width: 3, background: pal.accent, opacity: strike2 }} />
-                <strong>9. Governing Law.</strong> This Agreement shall be governed by the laws of <Redline strike={strike2} to="England and Wales" accent={pal.accent}>the State of New York</Redline>, and the parties submit to the exclusive jurisdiction of its courts.
-              </div>
-            </div>
-            <div style={{ width: 900, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 14, padding: '18px 24px', display: 'flex', alignItems: 'center', gap: 16, opacity: backIn, transform: `translateY(${(1 - backIn) * 14}px)`, boxShadow: '0 12px 32px rgba(16,18,21,0.08)' }}>
-              <Check on={backIn > 0.5} accent={pal.accent} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>Redlined draft returned to the fund</div>
-                <div style={{ ...mono, fontSize: 15, opacity: 0.55, marginTop: 4 }}>via Email · Slack · changes summarised</div>
-              </div>
-              <span style={{ ...mono, fontSize: 14, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '7px 14px' }}>→ fund inbox</span>
+            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(fp, 0.78, 0.08), textAlign: 'center', maxWidth: 1100 }}>
+              Your rules, trained with your team. <span style={{ color: pal.accent }}>No waiting on the lawyer.</span>
             </div>
           </div>
         )}
         {phase === 3 && (
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', gap: 14, padding: '118px 56px 36px' }}>
+            <div style={{ width: 1420, display: 'flex', gap: 28, alignItems: 'stretch', flex: 1, minHeight: 0 }}>
+              <div style={{ flex: '1 1 820px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', opacity: docIn, flexShrink: 0 }}>
+                  <span style={{ ...mono, opacity: 0.6 }}>Acme_Mutual_NDA_v3_redline.docx</span>
+                  <span style={{ flex: 1 }} />
+                  <span style={{ fontFamily: M, fontSize: 14, color: '#fff', background: '#C43D3D', borderRadius: 999, padding: '5px 12px' }}>2 tracked changes</span>
+                </div>
+                <div style={{
+                  flex: 1, minHeight: 0, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 12,
+                  boxShadow: '0 24px 60px rgba(16,18,21,0.12)', padding: '28px 44px 32px',
+                  opacity: docIn, transform: `translateY(${(1 - docIn) * 36}px)`,
+                }}>
+                  <div style={{ fontFamily: T, fontWeight: 600, fontSize: 18, letterSpacing: '0.08em', textAlign: 'center', color: pal.ink, marginBottom: 18 }}>MUTUAL NON-DISCLOSURE AGREEMENT</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 16 }}>
+                    {[100, 94, 62].map((w, i) => <div key={i} style={{ height: 7, width: `${w}%`, borderRadius: 4, background: pal.ink, opacity: 0.1 }} />)}
+                  </div>
+                  <div style={{ position: 'relative', fontFamily: T, fontSize: 16, lineHeight: 1.65, color: pal.ink }}>
+                    <span style={{ position: 'absolute', left: -24, top: 3, bottom: 3, width: 3, background: pal.accent, opacity: strike1 }} />
+                    <strong>3. Term.</strong> This Agreement shall remain in force for a period of <Redline strike={strike1} to="two (2) years" accent={pal.accent}>five (5) years</Redline> from the Effective Date, unless earlier terminated in accordance with clause 8.
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 7, margin: '16px 0' }}>
+                    {[97, 88].map((w, i) => <div key={i} style={{ height: 7, width: `${w}%`, borderRadius: 4, background: pal.ink, opacity: 0.1 }} />)}
+                  </div>
+                  <div style={{ position: 'relative', fontFamily: T, fontSize: 16, lineHeight: 1.65, color: pal.ink }}>
+                    <span style={{ position: 'absolute', left: -24, top: 3, bottom: 3, width: 3, background: pal.accent, opacity: strike2 }} />
+                    <strong>9. Governing Law.</strong> This Agreement shall be governed by the laws of <Redline strike={strike2} to="England and Wales" accent={pal.accent}>the State of New York</Redline>, and the parties submit to the exclusive jurisdiction of its courts.
+                  </div>
+                </div>
+              </div>
+
+              <div style={{
+                width: 420, flexShrink: 0, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16,
+                boxShadow: '0 24px 60px rgba(16,18,21,0.12)', overflow: 'hidden',
+                opacity: panelIn, transform: `translateX(${(1 - panelIn) * 36}px)`,
+                display: 'flex', flexDirection: 'column', minHeight: 0,
+              }}>
+                <div style={{ padding: '16px 20px 14px', borderBottom: `1px solid ${cardBorder}`, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                    <img src="assets/perry-logo.png" alt="Perry" style={{ height: 18, filter: pal.dark ? 'invert(1)' : 'none' }} />
+                    <span style={{ fontFamily: M, fontSize: 13, letterSpacing: '0.14em', color: pal.ink, opacity: 0.5 }}>DEVIATION ALERTS</span>
+                    <span style={{ flex: 1 }} />
+                    <span style={{ ...mono, fontSize: 12, color: pal.accent }}>Fund playbook</span>
+                  </div>
+                  <div style={{ fontFamily: F, fontSize: 14, lineHeight: 1.35, color: pal.ink, opacity: 0.7 }}>
+                    Flags anything outside the fund’s pre-agreed standards
+                  </div>
+                </div>
+                <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12, flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>
+                  <div style={{
+                    ...mono, fontSize: 13, opacity: 0.5 * (1 - issue1),
+                    position: 'absolute', left: 18, right: 18, top: 20,
+                  }}>
+                    Scanning draft vs 12 fund standards…
+                  </div>
+                  {[
+                    {
+                      e: issue1,
+                      n: '01',
+                      severity: 'OUTSIDE STANDARD',
+                      rule: 'Rule 04 · Term cap',
+                      title: 'Term exceeds pre-agreed maximum',
+                      draft: 'five (5) years',
+                      standard: '≤ two (2) years',
+                    },
+                    {
+                      e: issue2,
+                      n: '02',
+                      severity: 'OUTSIDE STANDARD',
+                      rule: 'Rule 07 · Governing law',
+                      title: 'Governing law off fund policy',
+                      draft: 'State of New York',
+                      standard: 'England & Wales',
+                    },
+                  ].map((d) => (
+                    <div key={d.n} style={{
+                      border: `1px solid ${d.e > 0.55 ? '#C43D3D' : cardBorder}`,
+                      borderLeft: `3px solid ${d.e > 0.55 ? '#C43D3D' : cardBorder}`,
+                      borderRadius: 12, padding: '12px 12px 13px',
+                      background: d.e > 0.55 ? (pal.dark ? 'rgba(196,61,61,0.1)' : 'rgba(196,61,61,0.05)') : pillBg,
+                      opacity: d.e,
+                      transform: `translateY(${(1 - d.e) * 16}px)`,
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                        <span style={{
+                          fontFamily: M, fontSize: 11, letterSpacing: '0.1em', color: '#fff',
+                          background: '#C43D3D', borderRadius: 999, padding: '3px 9px',
+                        }}>{d.severity}</span>
+                        <span style={{ ...mono, fontSize: 11, opacity: 0.5 }}>· {d.n}</span>
+                      </div>
+                      <div style={{ fontFamily: T, fontWeight: 600, fontSize: 16, color: pal.ink, lineHeight: 1.25, marginBottom: 4 }}>{d.title}</div>
+                      <div style={{ ...mono, fontSize: 11, color: pal.accent, marginBottom: 10 }}>{d.rule}</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                        <div style={{ borderRadius: 8, padding: '8px 10px', background: pal.dark ? 'rgba(242,239,232,0.06)' : 'rgba(16,18,21,0.04)' }}>
+                          <div style={{ ...mono, fontSize: 10, letterSpacing: '0.1em', opacity: 0.45, marginBottom: 4 }}>IN DRAFT</div>
+                          <div style={{ fontFamily: F, fontWeight: 600, fontSize: 13, color: '#C43D3D', textDecoration: 'line-through', lineHeight: 1.3 }}>{d.draft}</div>
+                        </div>
+                        <div style={{ borderRadius: 8, padding: '8px 10px', background: pal.dark ? 'rgba(0,156,127,0.12)' : 'rgba(0,156,127,0.08)' }}>
+                          <div style={{ ...mono, fontSize: 10, letterSpacing: '0.1em', color: pal.accent, marginBottom: 4 }}>FUND STANDARD</div>
+                          <div style={{ fontFamily: F, fontWeight: 600, fontSize: 13, color: pal.accent, lineHeight: 1.3 }}>{d.standard}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, opacity: d.e > 0.7 ? 1 : 0 }}>
+                        <Check on={d.e > 0.75} accent={pal.accent} />
+                        <span style={{ ...mono, fontSize: 11, color: pal.accent }}>Deviation flagged · auto-redlined</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              width: 1420, flexShrink: 0, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 14,
+              padding: '14px 22px', display: 'flex', alignItems: 'center', gap: 16,
+              opacity: backIn, transform: `translateY(${(1 - backIn) * 14}px)`, boxShadow: '0 12px 32px rgba(16,18,21,0.08)',
+            }}>
+              <Check on={backIn > 0.5} accent={pal.accent} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>2 deviations corrected to fund standard</div>
+                <div style={{ ...mono, fontSize: 14, opacity: 0.55, marginTop: 3 }}>via Email · Slack · redlined draft returned</div>
+              </div>
+              <span style={{ ...mono, fontSize: 13, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '6px 12px' }}>→ fund inbox</span>
+            </div>
+          </div>
+        )}
+        {phase === 4 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.82} size={122} color={pal.ink}>Forward it once.</Slam>
-            <Slam p={p} at={0.835} size={122} color={pal.accent}>Get the redline back.</Slam>
+            <Slam p={p} at={0.84} size={108} color={pal.ink}>Your playbook.</Slam>
+            <Slam p={p} at={0.855} size={108} color={pal.accent}>Their redline — without the wait.</Slam>
             <div style={{ marginTop: 56 }}>
-              <KpiFlip p={p} at={0.865} label="NDA review" from="30 min" to="7 min" />
+              <KpiFlip p={p} at={0.885} label="NDA review" from="30 min" to="7 min" />
             </div>
           </div>
         )}
@@ -513,6 +712,157 @@
     { co: 'Orange Ltd', doc: 'Series A AoA', term: '1.5× senior preference', hot: true },
     { co: 'Grape Ltd', doc: 'Seed AoA', term: '1.5× senior preference', hot: true },
   ];
+
+  function PatternsBackend({ p }) {
+    const pal = React.useContext(Pal);
+    const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
+    const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
+    const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
+    const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
+    const shell = ez(p, 0.04, 0.08);
+    const qIn = ez(p, 0.12, 0.06);
+    const graphIn = ez(p, 0.18, 0.08);
+    const search = ez(p, 0.38, 0.14);
+    const steps = [
+      { label: 'INDEX', detail: 'Embed clauses', at: 0.28 },
+      { label: 'RETRIEVE', detail: 'Vector + graph', at: 0.4 },
+      { label: 'RANK', detail: 'RAG rerank', at: 0.52 },
+      { label: 'GROUND', detail: 'Cite sources', at: 0.64 },
+    ];
+    const nodes = [
+      { id: 'fund', x: 310, y: 168, r: 46, label: 'Fund\ncorpus', hub: true },
+      { id: 'orange', x: 118, y: 78, r: 34, label: 'Orange' },
+      { id: 'grape', x: 502, y: 72, r: 34, label: 'Grape' },
+      { id: 'mango', x: 96, y: 250, r: 30, label: 'Mango' },
+      { id: 'aoa', x: 520, y: 248, r: 32, label: 'AoA' },
+      { id: 'pref', x: 310, y: 310, r: 36, label: 'Liq.\npref', hot: true },
+    ];
+    const edges = [
+      ['fund', 'orange'], ['fund', 'grape'], ['fund', 'mango'], ['fund', 'aoa'], ['fund', 'pref'],
+      ['orange', 'pref'], ['grape', 'pref'], ['aoa', 'pref'],
+    ];
+    const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+    const hit = (id) => {
+      const order = { fund: 0, orange: 0.15, grape: 0.22, pref: 0.35, aoa: 0.45, mango: 0.55 };
+      return clamp((search - (order[id] || 0)) / 0.25, 0, 1);
+    };
+    return (
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 22, padding: '0 70px' }}>
+        <div style={{
+          width: 1380, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
+          boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '28px 36px 32px',
+          opacity: shell, transform: `translateY(${(1 - shell) * 36}px)`,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+            <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
+            <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>BACKEND</span>
+            <span style={{ flex: 1 }} />
+            <span style={{ ...mono, fontSize: 14, opacity: 0.5 }}>Knowledge graph · RAG retrieval</span>
+          </div>
+
+          <div style={{ display: 'flex', gap: 28, alignItems: 'stretch' }}>
+            <div style={{ flex: '1 1 640px', minWidth: 0 }}>
+              <div style={{
+                background: pillBg, borderRadius: 999, padding: '14px 24px', fontFamily: M, fontSize: 18, color: pal.ink,
+                opacity: qIn, transform: `translateY(${(1 - qIn) * 12}px)`, marginBottom: 18,
+              }}>
+                What are the liquidation preferences across our portfolio?
+              </div>
+              <div style={{
+                height: 360, borderRadius: 14, border: `1px solid ${cardBorder}`, background: pal.dark ? 'rgba(242,239,232,0.03)' : '#FAFBFA',
+                position: 'relative', overflow: 'hidden', opacity: graphIn,
+              }}>
+                <svg width="100%" height="100%" viewBox="0 0 620 360" style={{ display: 'block' }}>
+                  {edges.map(([a, b], i) => {
+                    const A = byId[a], B = byId[b];
+                    const on = Math.min(hit(a), hit(b));
+                    return (
+                      <line key={i} x1={A.x} y1={A.y} x2={B.x} y2={B.y}
+                        stroke={on > 0.4 ? pal.accent : pal.ink}
+                        strokeWidth={on > 0.4 ? 2.4 : 1.4}
+                        opacity={0.12 + 0.55 * on * graphIn}
+                      />
+                    );
+                  })}
+                  {nodes.map((n) => {
+                    const h = hit(n.id);
+                    const lit = n.hub || n.hot ? Math.max(h, 0.35 * graphIn) : h;
+                    return (
+                      <g key={n.id} opacity={0.35 + 0.65 * Math.max(graphIn * 0.5, lit)} transform={`translate(${n.x},${n.y}) scale(${0.92 + 0.08 * lit})`}>
+                        <circle r={n.r} fill={n.hub || (n.hot && lit > 0.5) ? pal.accent : cardBg}
+                          stroke={n.hub || (n.hot && lit > 0.5) ? pal.accent : pal.ink}
+                          strokeWidth={n.hub ? 0 : 1.6}
+                          opacity={n.hub ? 0.95 : 1}
+                        />
+                        {n.label.split('\n').map((line, li, arr) => (
+                          <text key={li} y={(li - (arr.length - 1) / 2) * 14} textAnchor="middle" dominantBaseline="middle"
+                            fill={n.hub || (n.hot && lit > 0.5) ? '#fff' : pal.ink}
+                            style={{ fontFamily: M, fontSize: n.hub ? 13 : 12, letterSpacing: '0.04em' }}>
+                            {line}
+                          </text>
+                        ))}
+                      </g>
+                    );
+                  })}
+                  {/* search pulse traveling from query toward pref */}
+                  <circle cx={310 - 80 * (1 - search)} cy={40 + 120 * search} r={5 + 3 * search}
+                    fill={pal.accent} opacity={search > 0.05 && search < 0.95 ? 0.85 : 0} />
+                </svg>
+                <div style={{ position: 'absolute', left: 16, bottom: 14, display: 'flex', gap: 8 }}>
+                  {['45 companies', '12k clauses', 'live index'].map((t) => (
+                    <span key={t} style={{ ...mono, fontSize: 12, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '5px 10px', opacity: 0.7 * graphIn }}>{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ width: 380, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ fontFamily: T, fontWeight: 600, fontSize: 28, color: pal.ink, lineHeight: 1.2, marginBottom: 4, opacity: ez(p, 0.2, 0.06) }}>
+                A searchable graph behind every answer
+              </div>
+              <div style={{ fontFamily: F, fontSize: 16, lineHeight: 1.45, color: pal.ink, opacity: 0.7 * ez(p, 0.24, 0.05), marginBottom: 8 }}>
+                Documents become a knowledge graph. RAG retrieves the right clauses when you ask.
+              </div>
+              {steps.map((s, i) => {
+                const e = ez(p, s.at, 0.07);
+                const on = e > 0.55;
+                return (
+                  <div key={s.label} style={{
+                    display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderRadius: 12,
+                    background: on ? (pal.dark ? 'rgba(0,156,127,0.12)' : 'rgba(0,156,127,0.07)') : pillBg,
+                    border: `1px solid ${on ? pal.accent : cardBorder}`,
+                    opacity: Math.max(0.3, e), transform: `translateX(${(1 - e) * 18}px)`,
+                  }}>
+                    <span style={{
+                      width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                      background: on ? pal.accent : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)'),
+                      color: on ? '#fff' : pal.ink,
+                      fontFamily: M, fontSize: 13, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    }}>{i + 1}</span>
+                    <div>
+                      <div style={{ fontFamily: M, fontSize: 13, letterSpacing: '0.14em', color: on ? pal.accent : pal.ink, opacity: on ? 1 : 0.55 }}>{s.label}</div>
+                      <div style={{ fontFamily: F, fontWeight: 600, fontSize: 16, color: pal.ink, marginTop: 2 }}>{s.detail}</div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div style={{
+                marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px',
+                borderRadius: 12, background: pillBg, opacity: ez(p, 0.72, 0.06),
+              }}>
+                <Check on={ez(p, 0.72, 0.06) > 0.55} accent={pal.accent} />
+                <span style={{ fontFamily: F, fontWeight: 600, fontSize: 15, color: pal.ink }}>14 docs · 8 clauses retrieved</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.78, 0.06), textAlign: 'center' }}>
+          Ask anything — <span style={{ color: pal.accent }}>the corpus answers.</span>
+        </div>
+      </div>
+    );
+  }
+
   function SPatterns() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
@@ -520,18 +870,21 @@
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
-    const phase = p < 0.22 ? 0 : p < 0.76 ? 1 : 2;
-    const cardIn = ez(p, 0.23, 0.06);
-    const qIn = ez(p, 0.28, 0.06);
-    const ansIn = ez(p, 0.36, 0.07);
-    const takeaway = ez(p, 0.62, 0.06);
+    // 0 hook · 1 knowledge graph / RAG · 2 insights UI · 3 payoff
+    const phase = p < 0.14 ? 0 : p < 0.42 ? 1 : p < 0.78 ? 2 : 3;
+    const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
+    const lp = local(0.42, 0.78);
+    const cardIn = ez(lp, 0.04, 0.1);
+    const qIn = ez(lp, 0.14, 0.1);
+    const ansIn = ez(lp, 0.28, 0.12);
     const cols = 22, rows = 3, total = cols * rows;
-    const fillN = Math.floor(ez(p, 0.8, 0.12) * total);
+    const fillN = Math.floor(ez(p, 0.82, 0.12) * total);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
         {phase === 0 ? <SectionTitle p={p} num="01" text="TRENDS & INSIGHT" /> : <Kicker p={p} at={0} num="01" text="TRENDS & INSIGHT" />}
         {phase === 0 && <HookLines p={p} size={88} l1="You have 45 portfolio companies." l2="What did the legal documents tell you?" />}
-        {phase === 1 && (
+        {phase === 1 && <PatternsBackend p={local(0.14, 0.42)} />}
+        {phase === 2 && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 30 }}>
             <div style={{ width: 1160, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 42px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${0.96 + 0.04 * cardIn})` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
@@ -549,7 +902,7 @@
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
                   {PORTFOLIO_PREFS.map((row, i) => {
-                    const e = ez(p, 0.44 + i * 0.045, 0.07);
+                    const e = ez(lp, 0.42 + i * 0.08, 0.12);
                     return (
                       <div key={row.co} style={{ display: 'flex', alignItems: 'center', gap: 20, opacity: e, transform: `translateY(${(1 - e) * 12}px)`, padding: '14px 18px', borderRadius: 12, background: pal.dark ? 'rgba(242,239,232,0.05)' : 'rgba(16,18,21,0.035)' }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -561,27 +914,23 @@
                     );
                   })}
                 </div>
-                <div style={{ display: 'flex', gap: 12, opacity: ez(p, 0.56, 0.05) }}>
+                <div style={{ display: 'flex', gap: 12, opacity: ez(lp, 0.62, 0.08) }}>
                   {['14 documents queried', '8 citations'].map((t) => (
                     <span key={t} style={{ ...mono, fontSize: 15, border: `1px solid ${cardBorder}`, borderRadius: 999, padding: '7px 16px', opacity: 0.75 }}>{t}</span>
                   ))}
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 30, opacity: takeaway, transform: `translateY(${(1 - takeaway) * 12}px)` }}>
-                <span style={{ width: 10, height: 10, borderRadius: 5, background: pal.accent }} />
-                <span style={{ fontFamily: F, fontWeight: 600, fontSize: 22, color: pal.ink }}>1× non-participating is becoming your market standard — up 18% year-on-year.</span>
-              </div>
             </div>
-            <div style={{ width: 1160, opacity: ez(p, 0.28, 0.035), transform: `translateY(${(1 - ez(p, 0.28, 0.035)) * 10}px)` }}>
+            <div style={{ width: 1160, opacity: ez(lp, 0.12, 0.08), transform: `translateY(${(1 - ez(lp, 0.12, 0.08)) * 10}px)` }}>
               <span style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 27, color: pal.ink }}>Your next term sheet, negotiated from data — <span style={{ color: pal.accent }}>not recollection.</span></span>
             </div>
           </div>
         )}
-        {phase === 2 && (
+        {phase === 3 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div>
-              <Slam p={p} at={0.77} size={108} color={pal.ink}>One document is an answer.</Slam>
-              <Slam p={p} at={0.79} size={108} color={pal.accent}>Two hundred are a strategy.</Slam>
+              <Slam p={p} at={0.8} size={108} color={pal.ink}>One document is an answer.</Slam>
+              <Slam p={p} at={0.82} size={108} color={pal.accent}>Two hundred are a strategy.</Slam>
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols},1fr)`, gap: 10, marginTop: 60, width: 1150 }}>
                 {Array.from({ length: total }, (_, i) => {
                   const on = i < fillN;
@@ -597,9 +946,9 @@
   }
 
   const TASKS = [
-    { t: 'Collect signed IP assignment', c: 'Grape Ltd', o: 'External counsel', d: '01 Aug', s0: 'Awaiting signature' },
+    { t: 'Collect signed IP assignment', c: 'Grape Ltd', o: 'Company counsel', d: '01 Aug', s0: 'Awaiting signature' },
     { t: 'File SH01 \u2014 share allotment', c: 'Grape Ltd', o: 'J. Whitfield', d: '08 Aug', s0: 'In progress' },
-    { t: 'Board consent \u2014 ESOP top-up', c: 'Grape Ltd', o: 'External counsel', d: '15 Aug', s0: 'Waiting on counterparty', focus: true },
+    { t: 'Board consent \u2014 ESOP top-up', c: 'Grape Ltd', o: 'Company counsel', d: '15 Aug', s0: 'Waiting on counterparty', focus: true },
     { t: 'Update cap table post-closing', c: 'Grape Ltd', o: 'M. Osei', d: '22 Aug', s0: 'Not started' },
   ];
   const PACK_FILES = [
@@ -746,76 +1095,64 @@
 
   function TaskDetail({ p }) {
     const pal = React.useContext(Pal);
-    const { localTime } = useScene();
     const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
     const cardIn = ez(p, 0.02, 0.08);
-    const TYPE1 = '@El';
-    const n1 = Math.round(clamp((p - 0.18) / 0.06, 0, 1) * TYPE1.length);
-    const dropVis = Math.min(ez(p, 0.24, 0.05), 1 - ez(p, 0.38, 0.04));
-    const mentioned = p >= 0.4;
-    const REST = ' could you circulate the board consent for signature this week?';
-    const restIn = ez(p, 0.42, 0.06);
-    const posted = p >= 0.62;
-    const notified = ez(p, 0.68, 0.05);
-    const caret = !posted && p >= 0.14 && Math.floor(localTime * 2.5) % 2 === 0;
-    const press = 1 - 0.08 * Math.sin(Math.PI * clamp((p - 0.58) / 0.04, 0, 1));
-    const mentionChip = (
-      <span style={{ color: pal.accent, fontWeight: 600, background: pal.dark ? 'rgba(0,156,127,0.18)' : 'rgba(0,156,127,0.1)', borderRadius: 6, padding: '1px 6px' }}>@Elena Ruiz</span>
-    );
-    const commentBody = (
-      <span style={{ fontFamily: F, fontSize: 20, lineHeight: 1.6, color: pal.ink }}>
-        {mentioned ? mentionChip : <span style={{ color: pal.accent, fontWeight: 600 }}>{TYPE1.slice(0, n1)}</span>}
-        {mentioned ? <span style={{ opacity: posted ? 1 : restIn }}>{REST}</span> : ''}
-        {caret && <span style={{ borderLeft: `2px solid ${pal.ink}`, marginLeft: 2 }} />}
-      </span>
-    );
+    const agentIn = ez(p, 0.14, 0.07);
+    const line1 = ez(p, 0.22, 0.06);
+    const line2 = ez(p, 0.32, 0.06);
+    const duePulse = ez(p, 0.28, 0.08);
+    const notified = ez(p, 0.55, 0.07);
+    const dueUrgent = duePulse > 0.45;
     return (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: 1080, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 40px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${0.96 + 0.04 * cardIn})`, position: 'relative' }}>
           <div style={{ ...mono, opacity: 0.55, marginBottom: 18 }}>← All tasks</div>
           <div style={{ fontFamily: T, fontWeight: 600, fontSize: 40, color: pal.ink }}>Board consent — ESOP top-up</div>
-          <div style={{ display: 'flex', gap: 12, margin: '18px 0 28px' }}>
-            {['Grape Ltd', 'Due 15 Aug', 'Waiting on counterparty'].map((c, i) => (
-              <span key={c} style={{ fontFamily: M, fontSize: 15, color: i === 2 ? '#fff' : pal.ink, opacity: i === 2 ? 1 : 0.75, background: i === 2 ? '#b0873a' : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)'), borderRadius: 999, padding: '7px 15px' }}>{c}</span>
-            ))}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, margin: '18px 0 28px' }}>
+            <span style={{ fontFamily: M, fontSize: 15, color: pal.ink, opacity: 0.75, background: pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)', borderRadius: 999, padding: '7px 15px' }}>Grape Ltd</span>
+            <span style={{
+              fontFamily: M, fontSize: 15, borderRadius: 999, padding: '7px 15px',
+              color: dueUrgent ? '#fff' : pal.ink,
+              opacity: dueUrgent ? 1 : 0.75,
+              background: dueUrgent ? '#C43D3D' : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)'),
+              transform: `scale(${0.94 + 0.06 * duePulse})`,
+            }}>{dueUrgent ? 'Due in 3 days · 15 Aug' : 'Due 15 Aug'}</span>
+            <span style={{ fontFamily: M, fontSize: 15, color: '#fff', background: '#b0873a', borderRadius: 999, padding: '7px 15px' }}>Waiting on counterparty</span>
           </div>
-          <div style={{ ...mono, fontSize: 15, letterSpacing: '0.12em', opacity: 0.5, borderBottom: `1px solid ${cardBorder}`, paddingBottom: 10 }}>COMMENTS</div>
-          {posted && (
-            <div style={{ display: 'flex', gap: 16, padding: '20px 0 4px' }}>
-              <span style={{ width: 38, height: 38, borderRadius: 19, flexShrink: 0, background: pal.dark ? 'rgba(242,239,232,0.12)' : 'rgba(16,18,21,0.08)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: M, fontSize: 14, color: pal.ink }}>JW</span>
-              <div>
-                <div style={{ ...mono, fontSize: 15, opacity: 0.55, marginBottom: 6 }}>J. Whitfield · just now</div>
-                {commentBody}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, opacity: notified }}>
-                  <Check on={notified > 0.5} accent={pal.accent} />
-                  <span style={{ ...mono, opacity: 0.7 }}>Elena Ruiz (Grape Ltd) notified by email</span>
+          <div style={{ ...mono, fontSize: 15, letterSpacing: '0.12em', opacity: 0.5, borderBottom: `1px solid ${cardBorder}`, paddingBottom: 10 }}>ACTIVITY</div>
+          <div style={{ display: 'flex', gap: 16, padding: '22px 0 4px', opacity: agentIn, transform: `translateY(${(1 - agentIn) * 14}px)` }}>
+            <span style={{
+              width: 42, height: 42, borderRadius: 21, flexShrink: 0, background: pal.dark ? 'rgba(0,156,127,0.2)' : 'rgba(0,156,127,0.12)',
+              border: `1.5px solid ${pal.accent}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+            }}>
+              <img src="assets/perry-logo.png" alt="Perry" style={{ height: 16, filter: pal.dark ? 'invert(1)' : 'none' }} />
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>Perry AI</span>
+                <span style={{ fontFamily: M, fontSize: 12, letterSpacing: '0.1em', color: pal.accent, background: pal.dark ? 'rgba(0,156,127,0.16)' : 'rgba(0,156,127,0.1)', borderRadius: 999, padding: '3px 10px' }}>AGENT</span>
+                <span style={{ ...mono, fontSize: 14, opacity: 0.45 }}>· just now</span>
+              </div>
+              <div style={{
+                background: pillBg, border: `1px solid ${cardBorder}`, borderLeft: `3px solid ${pal.accent}`,
+                borderRadius: 12, padding: '18px 20px',
+              }}>
+                <div style={{ fontFamily: F, fontSize: 20, lineHeight: 1.55, color: pal.ink, opacity: line1, transform: `translateY(${(1 - line1) * 8}px)` }}>
+                  Reminder — this deadline is coming up fast.
+                </div>
+                <div style={{ fontFamily: F, fontSize: 20, lineHeight: 1.55, color: pal.ink, marginTop: 10, opacity: line2, transform: `translateY(${(1 - line2) * 8}px)` }}>
+                  Board consent is due <strong style={{ color: '#C43D3D' }}>15 Aug (3 days)</strong>. Circulate for signature so you catch it — don’t wait on the counterparty.
                 </div>
               </div>
-            </div>
-          )}
-          {!posted && (
-            <div style={{ position: 'relative', marginTop: 20 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                <span style={{ width: 38, height: 38, borderRadius: 19, flexShrink: 0, background: pal.dark ? 'rgba(242,239,232,0.12)' : 'rgba(16,18,21,0.08)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: M, fontSize: 14, color: pal.ink }}>JW</span>
-                <div style={{ flex: 1, minHeight: 96, background: pillBg, border: `1px solid ${cardBorder}`, borderRadius: 14, padding: '16px 20px' }}>{commentBody}</div>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
-                <span style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.dark ? '#141310' : '#fafafa', background: pal.dark ? '#f2efe8' : '#18181b', borderRadius: 999, padding: '9px 22px', transform: `scale(${press})` }}>Comment</span>
-              </div>
-              <div style={{ position: 'absolute', left: 54, top: 62, width: 380, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 12, boxShadow: '0 16px 40px rgba(16,18,21,0.18)', padding: 8, opacity: dropVis, transform: `translateY(${(1 - dropVis) * 8}px)`, zIndex: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: pal.dark ? 'rgba(0,156,127,0.16)' : 'rgba(0,156,127,0.08)', borderRadius: 8, padding: '10px 14px' }}>
-                  <span style={{ width: 34, height: 34, borderRadius: 17, background: pal.accent, color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontFamily: M, fontSize: 13 }}>ER</span>
-                  <div>
-                    <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>Elena Ruiz</div>
-                    <div style={{ ...mono, fontSize: 14, opacity: 0.6 }}>COO · Grape Ltd</div>
-                  </div>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, opacity: notified }}>
+                <Check on={notified > 0.5} accent={pal.accent} />
+                <span style={{ ...mono, opacity: 0.7 }}>J. Whitfield reminded by email · Slack</span>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -824,7 +1161,7 @@
   function STrack() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
-    // 0 hook · 1 chat upload+tasks · 2 task list click · 3 @mention detail · 4 payoff
+    // 0 hook · 1 chat upload+tasks · 2 task list click · 3 Perry deadline reminder · 4 payoff
     const phase = p < 0.1 ? 0 : p < 0.4 ? 1 : p < 0.55 ? 2 : p < 0.8 ? 3 : 4;
     const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
     return (
@@ -851,10 +1188,91 @@
   function SClose() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
+    const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
+    const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
+    const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
+    const phase = p < 0.36 ? 0 : 1;
+    const rows = [
+      { cheap: 'Uncited chat answer', grade: 'Cited from your deal room' },
+      { cheap: 'Generic clause guess', grade: 'Redlined to your playbook' },
+      { cheap: 'No memory of your past deals', grade: 'Your historical negotiation positions' },
+      { cheap: 'Hope someone follows up', grade: 'Owner · deadline · paper trail' },
+      { cheap: 'Chat-only, one person', grade: 'Connected fund workflow' },
+    ];
+    const panelIn = ez(p, 0.38, 0.08);
     return (
-      <div style={{ position: 'absolute', inset: 0, background: pal.paper, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <Slam p={p} at={0.05} size={72} color={pal.ink}>General legal AI completes a single task faster.</Slam>
-        <Slam p={p} at={0.14} size={88} color={pal.accent}>Perry runs the fund for you.</Slam>
+      <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
+        {phase === 0 && (
+          <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Slam p={p} at={0.04} size={72} color={pal.ink}>AI generated answers are cheap.</Slam>
+            <Slam p={p} at={0.16} size={72} color={pal.accent}>Fund-grade outcomes are not.</Slam>
+          </div>
+        )}
+        {phase === 1 && (
+          <div style={{ position: 'absolute', inset: 0, padding: '88px 90px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 22 }}>
+            <div style={{ opacity: ez(p, 0.36, 0.05) }}>
+              <div style={{ fontFamily: T, fontWeight: 600, fontSize: 32, color: pal.ink, lineHeight: 1.2 }}>AI generated answers are cheap.</div>
+              <div style={{ fontFamily: T, fontWeight: 600, fontSize: 32, color: pal.accent, lineHeight: 1.2, marginTop: 4 }}>Fund-grade outcomes are not.</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, opacity: panelIn, transform: `translateY(${(1 - panelIn) * 24}px)` }}>
+              <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, padding: '22px 26px 24px', boxShadow: '0 18px 44px rgba(16,18,21,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <span style={{ fontFamily: M, fontSize: 13, letterSpacing: '0.14em', opacity: 0.45 }}>GENERIC AI</span>
+                  <span style={{ flex: 1 }} />
+                  <span style={{ fontFamily: M, fontSize: 11, letterSpacing: '0.1em', color: '#fff', background: 'rgba(16,18,21,0.35)', borderRadius: 999, padding: '4px 10px' }}>CHEAP</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {rows.map((r, i) => {
+                    const e = ez(p, 0.42 + i * 0.05, 0.06);
+                    const st = ez(p, 0.48 + i * 0.05, 0.05);
+                    return (
+                      <div key={r.cheap} style={{
+                        position: 'relative', padding: '11px 14px', borderRadius: 12, background: pillBg,
+                        opacity: e, transform: `translateY(${(1 - e) * 10}px)`,
+                      }}>
+                        <div style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink, opacity: 0.55 }}>{r.cheap}</div>
+                        <span style={{ position: 'absolute', left: 12, right: 12, top: '52%', height: 2.5, background: '#C43D3D', width: `${st * 92}%`, borderRadius: 2 }} />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div style={{
+                background: cardBg, border: `1.5px solid ${pal.accent}`, borderRadius: 18, padding: '22px 26px 24px',
+                boxShadow: '0 18px 44px rgba(0,156,127,0.12)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <img src="assets/perry-logo.png" alt="Perry" style={{ height: 18, filter: pal.dark ? 'invert(1)' : 'none' }} />
+                  <span style={{ fontFamily: M, fontSize: 13, letterSpacing: '0.14em', color: pal.ink, opacity: 0.5 }}>PERRY</span>
+                  <span style={{ flex: 1 }} />
+                  <span style={{ fontFamily: M, fontSize: 11, letterSpacing: '0.1em', color: '#fff', background: pal.accent, borderRadius: 999, padding: '4px 10px' }}>FUND-GRADE</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {rows.map((r, i) => {
+                    const e = ez(p, 0.55 + i * 0.05, 0.06);
+                    return (
+                      <div key={r.grade} style={{
+                        display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 12,
+                        background: pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.07)',
+                        border: `1px solid ${pal.accent}`,
+                        opacity: e, transform: `translateY(${(1 - e) * 10}px)`,
+                      }}>
+                        <Check on={e > 0.55} accent={pal.accent} />
+                        <div style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink }}>{r.grade}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            <div style={{
+              fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, textAlign: 'center',
+              opacity: ez(p, 0.84, 0.06), transform: `translateY(${(1 - ez(p, 0.84, 0.06)) * 12}px)`,
+            }}>
+              Perry doesn’t just answer — <span style={{ color: pal.accent }}>it runs the work.</span>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -883,7 +1301,7 @@
     return (
       <Pal.Provider value={pal}>
         <div style={{ position: 'fixed', inset: 0, background: pal.paper }}>
-          <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="./assets/a-little-higher.mp3?v=3" soundtrackDelay={1} soundtrackVolume={1} persistKey="perry-intro-v5">
+          <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="./assets/a-little-higher.mp3?v=4" soundtrackDelay={1} soundtrackVolume={1} persistKey="perry-intro-v5">
             {{ Hook: SHook, Ask: SAsk, NDA: SNda, Patterns: SPatterns, Tracked: STrack, Close: SClose, Perry: SLogo }}
           </SceneStage>
         </div>
