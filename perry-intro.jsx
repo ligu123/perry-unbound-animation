@@ -422,7 +422,7 @@
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
         {phase === 0 ? <SectionTitle p={p} num="01" text="TRENDS & INSIGHT" /> : <Kicker p={p} at={0} num="01" text="TRENDS & INSIGHT" />}
-        {phase === 0 && <HookLines p={p} l1="You've signed 200 agreements." l2="What did they tell you?" />}
+        {phase === 0 && <HookLines p={p} size={88} l1="You have 45 portfolio companies." l2="What did the legal documents tell you?" />}
         {phase === 1 && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 30 }}>
             <div style={{ width: 1160, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 42px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${0.96 + 0.04 * cardIn})` }}>
