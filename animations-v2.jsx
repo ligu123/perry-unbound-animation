@@ -1074,111 +1074,119 @@ function AudioSprite({ src, start = 0, delay = 0, volume = 1, loop = false }) {
   const volN = Number(volume);
   volume = isFinite(volN) ? Math.max(0, Math.min(1, volN)) : 0.85;
   if (typeof loop === 'string') loop = loop !== 'false';
-  // Prefer actualTime so scrub-bar hover preview doesn't thrash the audio.
+
   const timeline = useTimeline();
   const time = timeline.actualTime != null ? timeline.actualTime : timeline.time;
-  const playing = timeline.playing;
+  const playing = !!(timeline.playing || timeline.extPlaying);
   const duration = timeline.duration;
-  const ref = React.useRef(null);
-  const wantPlayRef = React.useRef(false);
-  const wasPlayingRef = React.useRef(false);
-  const lastTimeRef = React.useRef(time);
-  const unlockedRef = React.useRef(false);
-  const syncRef = React.useRef({ start, delay, time, playing, duration });
-  syncRef.current = { start, delay, time, playing, duration };
 
-  const tryPlay = React.useCallback(() => {
-    const a = ref.current;
-    if (!a) return;
-    a.muted = false;
-    a.volume = volume;
-    const p = a.play();
-    if (p && p.catch) p.catch(() => {});
+  const ctxRef = React.useRef(null);
+  const gainRef = React.useRef(null);
+  const bufferRef = React.useRef(null);
+  const sourceRef = React.useRef(null);
+  const readyRef = React.useRef(false);
+  const [decoded, setDecoded] = React.useState(false);
+  const originRef = React.useRef({ playing: false, ctxAt: 0, offset: 0 });
+  const lastTimeRef = React.useRef(time);
+  const wasPlayingRef = React.useRef(false);
+  const wantPlayRef = React.useRef(false);
+  const unlockedRef = React.useRef(false);
+
+  const stopSource = React.useCallback(() => {
+    const srcNode = sourceRef.current;
+    sourceRef.current = null;
+    originRef.current.playing = false;
+    if (!srcNode) return;
+    try { srcNode.onended = null; } catch {}
+    try { srcNode.stop(); } catch {}
+    try { srcNode.disconnect(); } catch {}
+  }, []);
+
+  const startAt = React.useCallback((offset) => {
+    const ctx = ctxRef.current;
+    const buf = bufferRef.current;
+    const gain = gainRef.current;
+    if (!ctx || !buf || !gain) return;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    stopSource();
+    const max = Math.max(0, buf.duration - 0.05);
+    const off = Math.max(0, Math.min(offset, max));
+    if (off >= buf.duration - 0.03) return;
+    const node = ctx.createBufferSource();
+    node.buffer = buf;
+    node.loop = !!loop;
+    node.connect(gain);
+    node.onended = () => {
+      if (sourceRef.current === node) {
+        sourceRef.current = null;
+        originRef.current.playing = false;
+      }
+    };
+    try {
+      node.start(0, off);
+    } catch {
+      return;
+    }
+    sourceRef.current = node;
+    originRef.current = { playing: true, ctxAt: ctx.currentTime, offset: off };
+  }, [loop, stopSource]);
+
+  // Decode the whole file — HTMLAudioElement cannot seek this MP3 at all
+  // (currentTime sticks at 0), which is why music only worked from 0:00.
+  React.useEffect(() => {
+    let cancelled = false;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return undefined;
+    const ctx = new AC();
+    const gain = ctx.createGain();
+    gain.gain.value = volume;
+    gain.connect(ctx.destination);
+    ctxRef.current = ctx;
+    gainRef.current = gain;
+    readyRef.current = false;
+    bufferRef.current = null;
+    setDecoded(false);
+
+    (async () => {
+      try {
+        const res = await fetch(src);
+        const ab = await res.arrayBuffer();
+        const buf = await ctx.decodeAudioData(ab.slice(0));
+        if (cancelled) return;
+        bufferRef.current = buf;
+        readyRef.current = true;
+        setDecoded(true);
+      } catch (err) {
+        console.warn('AudioSprite: failed to decode', src, err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      stopSource();
+      try { gain.disconnect(); } catch {}
+      try { ctx.close(); } catch {}
+      ctxRef.current = null;
+      gainRef.current = null;
+      bufferRef.current = null;
+      readyRef.current = false;
+      setDecoded(false);
+    };
+  }, [src, stopSource]);
+
+  React.useEffect(() => {
+    const gain = gainRef.current;
+    if (gain) gain.gain.value = volume;
   }, [volume]);
 
   React.useEffect(() => {
-    const a = ref.current;
-    if (!a) return;
-    a.volume = volume;
-    a.loop = !!loop;
-  }, [volume, loop]);
-
-  React.useEffect(() => {
-    const a = ref.current;
-    if (!a) return;
-    // Force reload when the file changes (same path, new bytes / cache-bust).
-    unlockedRef.current = false;
-    a.load();
-  }, [src]);
-
-  React.useEffect(() => {
-    const a = ref.current;
-    if (!a) return;
-    const mediaDur = (a.duration && isFinite(a.duration)) ? a.duration : null;
-    // delay: stay silent until the playhead reaches `delay`, then map
-    // timeline (time - delay) onto the track starting at `start`.
-    const active = time >= delay;
-    const target = active ? Math.max(0, start + (time - delay)) : start;
-    // Past the end of the track — keep paused at the tail; don't restart.
-    const pastEnd = active && mediaDur != null && target >= mediaDur - 0.03;
-    const capped = mediaDur != null
-      ? Math.min(target, Math.max(0, mediaDur - 0.05))
-      : target;
-    const drift = Math.abs((a.currentTime || 0) - capped);
-    // Discontinuous scrub / reset (not a normal rAF tick).
-    const jumped = Math.abs(time - lastTimeRef.current) > 0.3;
-    const wasActive = lastTimeRef.current >= delay;
-    lastTimeRef.current = time;
-    const startedPlaying = playing && !wasPlayingRef.current;
-    wasPlayingRef.current = playing;
-    const justEntered = active && !wasActive;
-
-    // MP3 seeks are audible — free-run while playing. Only hard-seek on
-    // pause/scrub, play-start, delay-entry, ended-restart, or large drift.
-    const needsRestart = a.ended || (pastEnd === false && active && a.currentTime > capped + 1);
-    const shouldSeek = !playing || !active || startedPlaying || jumped || justEntered || needsRestart || drift > 0.5;
-    if (shouldSeek && (drift > 0.03 || needsRestart || a.ended || !active || justEntered)) {
-      try { a.currentTime = capped; } catch {}
-    }
-
-    wantPlayRef.current = playing && active && !pastEnd && time < duration - 0.001;
-    if (wantPlayRef.current) {
-      if (a.paused || a.ended) tryPlay();
-    } else if (!a.paused) {
-      a.pause();
-    }
-  }, [time, playing, start, delay, duration, tryPlay]);
-
-  // Browsers block autoplay-with-sound. On the first gesture, arm the
-  // element with a play()/pause() even during the delay window — otherwise
-  // play() after `delay` is treated as non-gesture and stays silent.
-  // Audio is portaled to document.body because <audio> inside
-  // svg/foreignObject often cannot play.
-  React.useEffect(() => {
     const unlock = () => {
-      const a = ref.current;
-      if (!a) return;
-      const s = syncRef.current;
-      const active = s.time >= s.delay;
-      const target = active ? Math.max(0, s.start + (s.time - s.delay)) : s.start;
-      try {
-        if (isFinite(a.duration) && a.duration > 0) {
-          a.currentTime = Math.min(target, Math.max(0, a.duration - 0.05));
-        } else {
-          a.currentTime = target;
-        }
-      } catch {}
-      a.muted = false;
-      a.volume = volume;
-      const p = a.play();
-      const after = () => {
-        unlockedRef.current = true;
-        if (!(s.playing && active)) {
-          try { a.pause(); } catch {}
-        }
-      };
-      if (p && p.then) p.then(after).catch(() => {});
-      else after();
+      if (unlockedRef.current) return;
+      unlockedRef.current = true;
+      const ctx = ctxRef.current;
+      if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
     };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
@@ -1186,21 +1194,40 @@ function AudioSprite({ src, start = 0, delay = 0, volume = 1, loop = false }) {
       window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('keydown', unlock);
     };
-  }, [volume]);
+  }, []);
 
-  const node = (
-    <audio
-      ref={ref}
-      src={src}
-      preload="auto"
-      playsInline
-      style={{ display: 'none' }}
-    />
+  React.useEffect(() => {
+    const buf = bufferRef.current;
+    if (!readyRef.current || !buf) return;
+
+    const active = time >= delay;
+    const target = active ? Math.max(0, start + (time - delay)) : start;
+    const pastEnd = active && target >= buf.duration - 0.03;
+
+    const jumped = Math.abs(time - lastTimeRef.current) > 0.25;
+    lastTimeRef.current = time;
+    const startedPlaying = playing && !wasPlayingRef.current;
+    wasPlayingRef.current = playing;
+
+    const wantPlay = playing && active && !pastEnd && time < duration - 0.001;
+    wantPlayRef.current = wantPlay;
+
+    if (!wantPlay) {
+      stopSource();
+      return;
+    }
+
+    // Free-run once started. Only reseat on scrub / play — do NOT correct
+    // for AudioContext vs rAF drift (that restarts the buffer every ~0.5s).
+    if (!originRef.current.playing || jumped || startedPlaying) {
+      startAt(target);
+    }
+  }, [time, playing, start, delay, duration, startAt, stopSource, decoded]);
+
+  // Hidden element kept for preload/export discovery; Web Audio is the player.
+  return (
+    <audio src={src} preload="auto" playsInline style={{ display: 'none' }} />
   );
-  // Keep the element outside the Stage svg/foreignObject.
-  return (typeof document !== 'undefined' && document.body)
-    ? ReactDOM.createPortal(node, document.body)
-    : node;
 }
 
 

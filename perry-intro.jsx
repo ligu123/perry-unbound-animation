@@ -10,26 +10,37 @@
 
   function Kicker({ p, at, num, text }) {
     const pal = React.useContext(Pal);
-    const e = ez(p, at, 0.04);
+    const e = ez(p, at, 0.06);
     return (
-      <div style={{ position: 'absolute', top: 72, left: 110, fontFamily: M, fontSize: 26, letterSpacing: '0.18em', color: pal.ink, opacity: e * 0.9, transform: `translateX(${(1 - e) * -16}px)`, display: 'flex', gap: 20 }}>
-        <span style={{ color: pal.accent, fontWeight: 500 }}>{num}</span>
-        <span>{text}</span>
+      <div style={{
+        position: 'absolute', top: 56, left: 110, zIndex: 5,
+        fontFamily: M, letterSpacing: '0.16em', color: pal.ink,
+        opacity: e, transform: `translateY(${(1 - e) * 10}px)`,
+        display: 'flex', alignItems: 'center', gap: 16,
+      }}>
+        <span style={{ fontFamily: T, fontWeight: 600, fontSize: 34, color: pal.accent, letterSpacing: '0.02em' }}>{num}</span>
+        <span style={{ fontSize: 22, opacity: 0.85 }}>{text}</span>
+        <span style={{ width: 36, height: 3, background: pal.accent, borderRadius: 2, opacity: 0.9 }} />
       </div>
     );
   }
 
-  function SectionTitle({ p, num, text }) {
+  function SectionTitle({ p, num, text, until = 0.11 }) {
     const pal = React.useContext(Pal);
-    const e = ez(p, 0.005, 0.028);
-    const w = ez(p, 0.02, 0.04);
+    const e = ez(p, 0.02, 0.07);
+    const fade = 1 - ez(p, until - 0.025, 0.025);
+    const o = e * fade;
     return (
-      <div style={{ position: 'absolute', top: 130, left: 110 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 24, opacity: e, transform: `translateY(${(1 - e) * 14}px)` }}>
-          <span style={{ fontFamily: T, fontWeight: 600, fontSize: 66, color: pal.accent }}>{num}</span>
-          <span style={{ fontFamily: M, fontSize: 31, letterSpacing: '0.24em', color: pal.ink }}>{text}</span>
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 5,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        opacity: o, transform: `translateY(${(1 - e) * 22}px)`,
+        pointerEvents: 'none',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 28 }}>
+          <span style={{ fontFamily: T, fontWeight: 600, fontSize: 120, color: pal.accent }}>{num}</span>
+          <span style={{ fontFamily: M, fontSize: 44, letterSpacing: '0.22em', color: pal.ink }}>{text}</span>
         </div>
-        <div style={{ height: 4, width: 340 * w, background: pal.accent, marginTop: 16, borderRadius: 2 }} />
       </div>
     );
   }
@@ -80,23 +91,23 @@
     );
   }
 
-  function HookLines({ p, l1, l2, size = 104 }) {
+  function HookLines({ p, l1, l2, size = 104, at = 0.13 }) {
     const pal = React.useContext(Pal);
     return (
       <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <Slam p={p} at={0.015} size={size} color={pal.ink}>{l1}</Slam>
-        <Slam p={p} at={0.045} size={size} color={pal.accent}>{l2}</Slam>
+        <Slam p={p} at={at} size={size} color={pal.ink}>{l1}</Slam>
+        <Slam p={p} at={at + 0.06} size={size} color={pal.accent}>{l2}</Slam>
       </div>
     );
   }
 
-  const QUOTE = [['“Does', 0], ['Simon', 1], ['need', 0], ['to', 0], ['be', 0], ['given', 0], ['quarterly', 1], ['information', 1], ['rights?”', 0]];
+  const QUOTE = [['“Are', 0], ['any', 0], ['LPs', 1], ['excluded', 1], ['from', 0], ['investments', 0], ['in', 0], ['the', 0], ['Philippines?”', 1]];
   function Quote({ p, at, words, pre }) {
     const pal = React.useContext(Pal);
     return (
       <div style={{ position: 'absolute', inset: 0, padding: '0 120px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {pre && <div style={{ fontFamily: M, fontSize: 28, color: pal.ink, opacity: ez(p, Math.max(0, at - 0.03), 0.03) * 0.7, marginBottom: 30 }}>{pre}</div>}
-        <div style={{ fontFamily: T, fontWeight: 600, fontSize: 80, lineHeight: 1.18, maxWidth: 1380, letterSpacing: '-0.01em', fontStyle: 'italic' }}>
+        <div style={{ fontFamily: T, fontWeight: 600, fontSize: 72, lineHeight: 1.18, maxWidth: 1380, letterSpacing: '-0.01em', fontStyle: 'italic' }}>
           {words.map(([w, acc], i) => {
             const e = ez(p, at + i * 0.007, 0.028);
             return <span key={i} style={{ display: 'inline-block', marginRight: '0.26em', opacity: e, transform: `translateY(${(1 - e) * 18}px)`, color: acc ? pal.accent : pal.ink }}>{w}</span>;
@@ -118,51 +129,32 @@
     const cardBg = pal.dark ? '#1f1d18' : '#ffffff';
     const cardBorder = pal.dark ? 'rgba(242,239,232,0.14)' : '#E4E7E5';
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
-    const codeBg = pal.dark ? 'rgba(242,239,232,0.05)' : '#F7F8F7';
     const mono = { fontFamily: M, fontSize: 15, color: pal.ink };
     const cardIn = ez(p, 0.02, 0.08);
     const qIn = ez(p, 0.1, 0.06);
-    const outIn = ez(p, 0.86, 0.06);
-    const tools = [
-      {
-        at: 0.18,
-        name: 'lookup_party',
-        args: '{ name: "Simon", company: "Orange Ltd" }',
-        result: '{ role: "Major Investor", holding: "£250k+", series: "B" }',
-      },
-      {
-        at: 0.36,
-        name: 'search_deal_room',
-        args: '{ query: "information rights", party: "Simon" }',
-        result: '{ docs: ["SHA", "IRA", "Side Letter"], hits: 3 }',
-      },
-      {
-        at: 0.54,
-        name: 'read_clause',
-        args: '{ doc: "SHA", section: "4.2" }',
-        result: '{ entitlement: "quarterly pack", days: 45 }',
-      },
-      {
-        at: 0.72,
-        name: 'cite_and_decide',
-        args: '{ threshold: "Major Investor", met: true }',
-        result: '{ answer: "Yes", citations: [1, 2, 3] }',
-      },
+    const sweep = ez(p, 0.2, 0.12);
+    const outIn = ez(p, 0.76, 0.06);
+    const docs = [
+      { at: 0.22, kind: 'SIDE LETTER', name: 'Alpha Capital — Side Letter', clause: 'Excluded jurisdictions · ASEAN', hit: true, excerpt: '…shall not be required to participate in investments in the Philippines…' },
+      { at: 0.34, kind: 'SIDE LETTER', name: 'Meridian LP — Side Letter', clause: 'Investment restrictions', hit: false, excerpt: 'No Philippines exclusion · cleared' },
+      { at: 0.46, kind: 'SIDE LETTER', name: 'Northwind Partners — Side Letter', clause: 'Geographic carve-outs', hit: true, excerpt: '…opt-out for Philippines and Indonesia…' },
+      { at: 0.58, kind: 'LPA', name: 'Fund LPA — Sch. 3', clause: 'Investment Restrictions', hit: true, excerpt: 'Schedule lists restricted jurisdictions; LP side letters may add further exclusions.' },
+      { at: 0.7, kind: 'LPA', name: 'Fund LPA — cl. 8.4', clause: 'Excuse rights', hit: false, excerpt: 'Excuse mechanics referenced · no Philippines default' },
     ];
     return (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '118px 56px 36px' }}>
         <div style={{
-          width: 1180, maxHeight: '100%', background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
-          boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '28px 40px 32px',
+          width: 1240, maxHeight: '100%', background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
+          boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '28px 40px 30px',
           opacity: cardIn, transform: `translateY(${(1 - cardIn) * 36}px) scale(${0.96 + 0.04 * cardIn})`,
           display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16, flexShrink: 0 }}>
             <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
             <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>AGENT</span>
-            <span style={{ ...mono, fontSize: 14, opacity: 0.45, marginLeft: 4 }}>tool calls</span>
+            <span style={{ ...mono, fontSize: 14, opacity: 0.45, marginLeft: 4 }}>searching corpus</span>
             <span style={{ flex: 1 }} />
-            <span style={{ ...mono, fontSize: 14, color: pal.accent, opacity: ez(p, 0.12, 0.05) }}>running · deal room</span>
+            <span style={{ ...mono, fontSize: 14, color: pal.accent, opacity: sweep }}>side letters · LPA</span>
           </div>
 
           <div style={{
@@ -170,62 +162,63 @@
             opacity: qIn, transform: `translateY(${(1 - qIn) * 12}px)`,
           }}>
             <div style={{ ...mono, fontSize: 12, opacity: 0.5, marginBottom: 4, letterSpacing: '0.12em' }}>USER</div>
-            <div style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>Does Simon need to be given quarterly information rights?</div>
+            <div style={{ fontFamily: F, fontWeight: 600, fontSize: 20, color: pal.ink }}>Are any LPs excluded from investments in the Philippines?</div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1, minHeight: 0, overflow: 'hidden' }}>
-            {tools.map((t, i) => {
-              const e = ez(p, t.at, 0.08);
-              const calling = e > 0.15 && e < 0.55;
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexShrink: 0,
+            opacity: ez(p, 0.18, 0.06),
+          }}>
+            <span style={{ width: 8, height: 8, borderRadius: 4, background: pal.accent }} />
+            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 16, color: pal.ink }}>Reading side letters and LPA clauses…</span>
+            <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>5 documents in scope</span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            {docs.map((d) => {
+              const e = ez(p, d.at, 0.08);
               const done = e >= 0.55;
-              const resultIn = ez(p, t.at + 0.05, 0.06);
+              const scanning = e > 0.15 && e < 0.55;
               return (
-                <div key={t.name} style={{
-                  border: `1px solid ${done || calling ? pal.accent : cardBorder}`,
-                  borderRadius: 12, overflow: 'hidden',
-                  opacity: Math.max(0.2, e),
-                  transform: `translateY(${(1 - e) * 14}px)`,
-                  background: done ? (pal.dark ? 'rgba(0,156,127,0.06)' : 'rgba(0,156,127,0.04)') : cardBg,
+                <div key={d.name} style={{
+                  display: 'grid', gridTemplateColumns: '110px 1fr auto', gap: 14, alignItems: 'center',
+                  padding: '12px 16px', borderRadius: 12,
+                  border: `1px solid ${done && d.hit ? pal.accent : cardBorder}`,
+                  background: done && d.hit ? (pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.06)') : pillBg,
+                  opacity: Math.max(0.25, e),
+                  transform: `translateX(${(1 - e) * 20}px)`,
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderBottom: `1px solid ${cardBorder}` }}>
-                    <span style={{
-                      fontFamily: M, fontSize: 11, letterSpacing: '0.1em', borderRadius: 999, padding: '3px 9px',
-                      color: done ? '#fff' : (calling ? pal.accent : pal.ink),
-                      background: done ? pal.accent : (calling ? (pal.dark ? 'rgba(0,156,127,0.16)' : 'rgba(0,156,127,0.1)') : pillBg),
-                      opacity: done || calling ? 1 : 0.5,
-                    }}>{done ? 'DONE' : calling ? 'CALLING' : 'QUEUED'}</span>
-                    <span style={{ fontFamily: M, fontSize: 16, color: pal.ink }}>
-                      <span style={{ opacity: 0.45 }}>tool.</span>
-                      <span style={{ color: pal.accent, fontWeight: 500 }}>{t.name}</span>
-                      <span style={{ opacity: 0.45 }}>()</span>
-                    </span>
-                    <span style={{ flex: 1 }} />
-                    <span style={{ ...mono, fontSize: 12, opacity: 0.4 }}>#{i + 1}</span>
+                  <span style={{
+                    fontFamily: M, fontSize: 11, letterSpacing: '0.1em', borderRadius: 999, padding: '4px 10px', textAlign: 'center',
+                    color: d.kind === 'LPA' ? pal.accent : pal.ink,
+                    background: d.kind === 'LPA' ? (pal.dark ? 'rgba(0,156,127,0.16)' : 'rgba(0,156,127,0.1)') : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.06)'),
+                  }}>{d.kind}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink }}>{d.name}</div>
+                    <div style={{ ...mono, fontSize: 12, opacity: 0.5, marginTop: 2 }}>{d.clause}</div>
+                    {(done || scanning) && (
+                      <div style={{
+                        fontFamily: F, fontStyle: 'italic', fontSize: 14, color: pal.ink, opacity: done ? 0.75 : 0.45,
+                        marginTop: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      }}>{d.excerpt}</div>
+                    )}
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                    <div style={{ padding: '10px 14px', borderRight: `1px solid ${cardBorder}`, background: codeBg }}>
-                      <div style={{ ...mono, fontSize: 11, letterSpacing: '0.12em', opacity: 0.45, marginBottom: 6 }}>ARGS</div>
-                      <div style={{ fontFamily: M, fontSize: 13, color: pal.ink, lineHeight: 1.45, opacity: 0.85 }}>{t.args}</div>
-                    </div>
-                    <div style={{ padding: '10px 14px', background: done ? (pal.dark ? 'rgba(0,156,127,0.08)' : 'rgba(0,156,127,0.05)') : codeBg, opacity: Math.max(0.35, resultIn) }}>
-                      <div style={{ ...mono, fontSize: 11, letterSpacing: '0.12em', color: done ? pal.accent : pal.ink, opacity: done ? 1 : 0.45, marginBottom: 6 }}>RESULT</div>
-                      <div style={{ fontFamily: M, fontSize: 13, color: done ? pal.accent : pal.ink, lineHeight: 1.45, opacity: done ? 0.95 : 0.5 }}>
-                        {done || calling ? t.result : '{ … }'}
-                      </div>
-                    </div>
-                  </div>
+                  <span style={{
+                    fontFamily: M, fontSize: 12, letterSpacing: '0.08em', borderRadius: 999, padding: '5px 11px', whiteSpace: 'nowrap',
+                    color: done ? (d.hit ? '#fff' : pal.ink) : (scanning ? pal.accent : pal.ink),
+                    background: done ? (d.hit ? pal.accent : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.06)')) : 'transparent',
+                    border: scanning ? `1px solid ${pal.accent}` : '1px solid transparent',
+                    opacity: done || scanning ? 1 : 0.4,
+                  }}>{done ? (d.hit ? 'HIT' : 'CLEAR') : scanning ? 'READING' : 'QUEUED'}</span>
                 </div>
               );
             })}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 16, opacity: outIn, transform: `translateY(${(1 - outIn) * 12}px)`, flexShrink: 0 }}>
-            <span style={{
-              fontFamily: M, fontSize: 12, letterSpacing: '0.12em', color: pal.accent,
-              border: `1.5px solid ${pal.accent}`, borderRadius: 999, padding: '7px 14px',
-            }}>RETURN</span>
-            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>Cited answer ready</span>
-            <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>→ handoff to Assistant</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 14, opacity: outIn, transform: `translateY(${(1 - outIn) * 12}px)`, flexShrink: 0 }}>
+            <Check on={outIn > 0.55} accent={pal.accent} />
+            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>2 LP exclusions found · 3 docs clear</span>
+            <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>→ composing cited answer</span>
           </div>
         </div>
       </div>
@@ -259,8 +252,8 @@
     const hover = p >= 0.4 && p < 0.62;
     const popVis = Math.min(ez(p, 0.42, 0.06), 1 - ez(p, 0.6, 0.06));
     const zoom = 1 + 0.09 * Math.min(ez(p, 0.35, 0.08), 1 - ez(p, 0.62, 0.08));
-    const h2 = { fontFamily: T, fontWeight: 600, fontSize: 30, color: pal.ink, margin: '34px 0 12px' };
-    const body = { fontFamily: F, fontWeight: 400, fontSize: 21.5, lineHeight: 1.55, color: pal.ink, opacity: 0.92 };
+    const h2 = { fontFamily: T, fontWeight: 600, fontSize: 28, color: pal.ink, margin: '28px 0 12px' };
+    const body = { fontFamily: F, fontWeight: 400, fontSize: 20, lineHeight: 1.55, color: pal.ink, opacity: 0.92 };
     const badge = (n, hot, ref) => (
       <span ref={ref} style={{ display: 'inline-block', fontFamily: M, fontSize: 16, color: hot ? '#fff' : pal.accent, background: hot ? pal.accent : (pal.dark ? 'rgba(0,156,127,0.18)' : 'rgba(0,156,127,0.12)'), border: `1px solid ${pal.accent}`, borderRadius: 7, padding: '1px 9px', marginLeft: 8, verticalAlign: '2px', transform: hot ? 'scale(1.15)' : 'scale(1)' }}>{n}</span>
     );
@@ -271,37 +264,37 @@
             <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
             <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>ASSISTANT</span>
             <span style={{ flex: 1 }} />
-            <span style={{ fontFamily: M, fontSize: 15, color: pal.ink, opacity: 0.45 }}>Orange Ltd · Series B</span>
+            <span style={{ fontFamily: M, fontSize: 15, color: pal.ink, opacity: 0.45 }}>Fund I · LP corpus</span>
           </div>
           <div style={{ position: 'absolute', left: 0, right: 0, top: 80, bottom: 0, overflow: 'hidden' }}>
             <div ref={colRef} style={{ position: 'absolute', left: 48, right: 48, top: 0, transform: `translateY(${24 - scroll}px)` }}>
-              <div style={{ background: pillBg, borderRadius: 999, padding: '18px 30px', fontFamily: M, fontSize: 22, color: pal.ink }}>
-                Does Simon need to be given quarterly information rights?
+              <div style={{ background: pillBg, borderRadius: 999, padding: '18px 30px', fontFamily: M, fontSize: 20, color: pal.ink }}>
+                Are any LPs excluded from investments in the Philippines?
               </div>
               <div style={{ opacity: reveal, transform: `translateY(${(1 - reveal) * 16}px)` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 6px', fontFamily: M, fontSize: 17, color: pal.ink, opacity: 0.55 }}>
                   <span style={{ width: 13, height: 16, border: `1.5px solid ${pal.ink}`, borderRadius: 3, display: 'inline-block' }} />
-                  Searched deal room · 3 documents
+                  Searched side letters + LPA · 5 documents · 2 exclusions
                 </div>
-                <div style={{ ...body, margin: '14px 0 4px' }}>Yes — if Simon is a Major Investor under the Orange Ltd Series B suite:</div>
-                <div style={h2}>Shareholders&apos; Agreement — Information Rights</div>
+                <div style={{ ...body, margin: '14px 0 4px' }}>Yes — <strong>two LPs</strong> have Philippines exclusions in their side letters:</div>
+                <div style={h2}>Alpha Capital — Side Letter</div>
                 <div style={body}>
-                  Each <strong>Major Investor</strong> is entitled to unaudited quarterly financial statements within 45 days of quarter-end, and an annual budget within 30 days of year-start.{badge('1', hover, badgeRef)}
+                  Alpha is not required to participate in investments in the <strong>Philippines</strong>. The carve-out sits in the excluded-jurisdictions schedule.{badge('1', hover, badgeRef)}
                 </div>
-                <div style={h2}>Investor Rights Agreement — cl. 3.1</div>
+                <div style={h2}>Northwind Partners — Side Letter</div>
                 <div style={body}>
-                  “Major Investor” means any holder of at least <strong>£250,000</strong> of Series B Preferred (or Ordinary Shares issued on conversion). Simon’s holding meets that threshold.{badge('2', false, null)}
+                  Northwind holds an opt-out for <strong>Philippines and Indonesia</strong> under geographic investment restrictions.{badge('2', false, null)}
                 </div>
-                <div style={h2}>Side Letter — inspection rights</div>
+                <div style={h2}>Fund LPA — Schedule 3</div>
                 <div style={body}>
-                  Simon also has a contractual right to <strong>reasonable inspection</strong> of books and records on 10 business days’ notice, in addition to the quarterly pack.{badge('3', false, null)}
+                  The LPA allows LP side letters to add jurisdiction exclusions on top of the fund’s base restricted list; Meridian’s side letter is clear of a Philippines carve-out.{badge('3', false, null)}
                 </div>
               </div>
-              <div style={{ position: 'absolute', left: Math.max(0, bp.x - 450), top: bp.y + 22, width: 420, background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: `3px solid ${pal.accent}`, borderRadius: 12, boxShadow: '0 16px 40px rgba(16,18,21,0.18)', padding: '20px 24px', opacity: popVis, transform: `translateY(${(1 - popVis) * 10}px)`, zIndex: 20 }}>
-                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.4 }}>Orange Ltd — Series B — Shareholders&apos; Agreement.docx</div>
-                <div style={{ fontFamily: M, fontSize: 15, color: pal.accent, margin: '8px 0 10px' }}>Information Rights · quarterly reporting</div>
+              <div style={{ position: 'absolute', left: Math.max(0, bp.x - 450), top: bp.y + 22, width: 440, background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: `3px solid ${pal.accent}`, borderRadius: 12, boxShadow: '0 16px 40px rgba(16,18,21,0.18)', padding: '20px 24px', opacity: popVis, transform: `translateY(${(1 - popVis) * 10}px)`, zIndex: 20 }}>
+                <div style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink, lineHeight: 1.4 }}>Alpha Capital — Side Letter.docx</div>
+                <div style={{ fontFamily: M, fontSize: 15, color: pal.accent, margin: '8px 0 10px' }}>Excluded jurisdictions · Philippines</div>
                 <div style={{ fontFamily: F, fontStyle: 'italic', fontSize: 16.5, lineHeight: 1.55, color: pal.ink, opacity: 0.85 }}>
-                  “The Company shall deliver to each Major Investor… unaudited quarterly financial statements within forty-five (45) days after the end of each fiscal quarter…”
+                  “The Limited Partner shall not be required to participate in any Portfolio Investment located in the Philippines…”
                 </div>
               </div>
               <Cursor x={curX} y={curY} opacity={curO} />
@@ -315,18 +308,21 @@
   function SAsk() {
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
-    // 0 quote · 1 agent backend work · 2 answer UI · 3 payoff
-    const phase = p < 0.16 ? 0 : p < 0.42 ? 1 : p < 0.78 ? 2 : 3;
+    // 0 title+quote · 1 agent backend work · 2 answer UI · 3 payoff
+    const TITLE = 0.11;
+    const phase = p < 0.347 ? 0 : p < 0.587 ? 1 : p < 0.78 ? 2 : 3;
     const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
-        {phase === 0 ? <SectionTitle p={p} num="02" text="ASK ANYTHING" /> : <Kicker p={p} at={0.02} num="02" text="ASK ANYTHING" />}
-        {phase === 0 && <Quote p={p} at={0.07} words={QUOTE} pre="Deal counsel, night before signing —" />}
-        {phase === 1 && <AskAgentWork p={local(0.16, 0.42)} />}
-        {phase === 2 && <AnswerDoc p={local(0.42, 0.78)} pal={pal} />}
+        {phase === 0 && p < TITLE
+          ? <SectionTitle p={p} num="02" text="ASK ANYTHING" until={TITLE} />
+          : <Kicker p={p} at={phase === 0 ? TITLE : 0.02} num="02" text="ASK ANYTHING" />}
+        {phase === 0 && p >= TITLE - 0.02 && <Quote p={p} at={0.14} words={QUOTE} pre="Investment committee, before the next close —" />}
+        {phase === 1 && <AskAgentWork p={local(0.347, 0.587)} />}
+        {phase === 2 && <AnswerDoc p={local(0.587, 0.78)} pal={pal} />}
         {phase === 3 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.8} size={150} color={pal.ink}>Ask.</Slam>
+            <Slam p={p} at={0.8} size={150} color={pal.ink}>Asked.</Slam>
             <Slam p={p} at={0.82} size={150} color={pal.ink}>Answered.</Slam>
             <Slam p={p} at={0.84} size={150} color={pal.accent}>Cited.<span style={{ display: 'inline-block', fontFamily: M, fontStyle: 'normal', fontSize: 34, fontWeight: 400, color: pal.accent, border: `2px solid ${pal.accent}`, borderRadius: 10, padding: '2px 18px', marginLeft: 26, verticalAlign: '18px' }}>1</span></Slam>
             <div style={{ marginTop: 52 }}>
@@ -366,71 +362,95 @@
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
     const shell = ez(p, 0.04, 0.08);
     const titleIn = ez(p, 0.1, 0.07);
+    const stepA = ez(p, 0.22, 0.08);
+    const stepB = ez(p, 0.4, 0.08);
     const rules = [
-      { id: '04', title: 'Term cap', detail: 'Confidentiality ≤ two (2) years', at: 0.28 },
-      { id: '07', title: 'Governing law', detail: 'England and Wales only', at: 0.38 },
-      { id: '09', title: 'Mutual form', detail: 'Reject one-way NDAs', at: 0.48 },
-      { id: '11', title: 'Residual info', detail: 'No residual knowledge clause', at: 0.58 },
+      { id: '04', title: 'Term cap', detail: 'Confidentiality ≤ two (2) years', at: 0.55 },
+      { id: '07', title: 'Governing law', detail: 'England and Wales only', at: 0.62 },
+      { id: '09', title: 'Mutual form', detail: 'Reject one-way NDAs', at: 0.69 },
     ];
-    const done = ez(p, 0.72, 0.08);
+    const done = ez(p, 0.72, 0.07);
     return (
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, padding: '0 80px' }}>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', gap: 14, padding: '118px 70px 28px' }}>
         <div style={{
-          width: 1080, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
-          boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 40px',
-          opacity: shell, transform: `translateY(${(1 - shell) * 36}px)`,
+          width: 1100, maxHeight: '100%', background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18,
+          boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '22px 32px 24px',
+          opacity: shell, transform: `translateY(${(1 - shell) * 28}px)`,
+          display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 22 }}>
-            <img src="assets/perry-logo.png" alt="Perry" style={{ height: 22, filter: pal.dark ? 'invert(1)' : 'none' }} />
-            <span style={{ fontFamily: M, fontSize: 18, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>PLAYBOOK</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14, flexShrink: 0 }}>
+            <img src="assets/perry-logo.png" alt="Perry" style={{ height: 20, filter: pal.dark ? 'invert(1)' : 'none' }} />
+            <span style={{ fontFamily: M, fontSize: 16, letterSpacing: '0.16em', color: pal.ink, opacity: 0.5 }}>PLAYBOOK</span>
             <span style={{ flex: 1 }} />
-            <span style={{ ...mono, fontSize: 14, opacity: 0.5 }}>NDA review · customised for your fund</span>
+            <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>NDA review · customised · tested</span>
           </div>
-          <div style={{ opacity: titleIn, transform: `translateY(${(1 - titleIn) * 14}px)` }}>
-            <div style={{ fontFamily: T, fontWeight: 600, fontSize: 42, color: pal.ink, lineHeight: 1.15, marginBottom: 12 }}>
-              We customise the NDA rules <span style={{ color: pal.accent }}>with your team</span>
+          <div style={{ opacity: titleIn, transform: `translateY(${(1 - titleIn) * 12}px)`, marginBottom: 14, flexShrink: 0 }}>
+            <div style={{ fontFamily: T, fontWeight: 600, fontSize: 30, color: pal.ink, lineHeight: 1.15, marginBottom: 8 }}>
+              A Perry lawyer sits with your team — <span style={{ color: pal.accent }}>then we prove it works</span>
             </div>
-            <div style={{ fontFamily: F, fontSize: 20, lineHeight: 1.45, color: pal.ink, opacity: 0.72, maxWidth: 820, marginBottom: 28 }}>
-              Sit with counsel once. Encode your negotiated positions. Every NDA after that reviews against your playbook — not a generic checklist.
+            <div style={{ fontFamily: F, fontSize: 16, lineHeight: 1.4, color: pal.ink, opacity: 0.72, maxWidth: 880 }}>
+              Encode your negotiated positions together. Run evaluation NDAs before go-live. Only drafts outside the playbook escalate to your legal team.
             </div>
           </div>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 12, marginBottom: 18,
-            background: pal.dark ? 'rgba(0,156,127,0.12)' : 'rgba(0,156,127,0.08)', border: `1px solid ${pal.accent}`,
-            opacity: ez(p, 0.2, 0.06),
-          }}>
-            <span style={{ fontFamily: M, fontSize: 13, letterSpacing: '0.12em', color: pal.accent }}>WORKSHOP</span>
-            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 17, color: pal.ink }}>Perry × Company counsel · Fund NDA playbook</span>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12, flexShrink: 0 }}>
+            <div style={{
+              padding: '12px 14px', borderRadius: 12, border: `1px solid ${stepA > 0.55 ? pal.accent : cardBorder}`,
+              background: stepA > 0.55 ? (pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.06)') : pillBg,
+              opacity: Math.max(0.35, stepA), transform: `translateY(${(1 - stepA) * 10}px)`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <span style={{ fontFamily: M, fontSize: 11, letterSpacing: '0.12em', color: pal.accent }}>01 · WORKSHOP</span>
+                <span style={{ flex: 1 }} />
+                <Check on={stepA > 0.65} accent={pal.accent} />
+              </div>
+              <div style={{ fontFamily: F, fontWeight: 600, fontSize: 16, color: pal.ink, marginBottom: 4 }}>Perry lawyer × your company counsel</div>
+              <div style={{ ...mono, fontSize: 12, opacity: 0.55, lineHeight: 1.35 }}>Sit together once. Capture positions into the Fund NDA playbook.</div>
+            </div>
+            <div style={{
+              padding: '12px 14px', borderRadius: 12, border: `1px solid ${stepB > 0.55 ? pal.accent : cardBorder}`,
+              background: stepB > 0.55 ? (pal.dark ? 'rgba(0,156,127,0.1)' : 'rgba(0,156,127,0.06)') : pillBg,
+              opacity: Math.max(0.35, stepB), transform: `translateY(${(1 - stepB) * 10}px)`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <span style={{ fontFamily: M, fontSize: 11, letterSpacing: '0.12em', color: pal.accent }}>02 · EVALUATION</span>
+                <span style={{ flex: 1 }} />
+                <Check on={stepB > 0.65} accent={pal.accent} />
+              </div>
+              <div style={{ fontFamily: F, fontWeight: 600, fontSize: 16, color: pal.ink, marginBottom: 4 }}>Test before real NDAs</div>
+              <div style={{ ...mono, fontSize: 12, opacity: 0.55, lineHeight: 1.35 }}>Run sample NDAs against the playbook. Tune rules until deviations look right.</div>
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
             {rules.map((r) => {
-              const e = ez(p, r.at, 0.07);
+              const e = ez(p, r.at, 0.06);
               return (
                 <div key={r.id} style={{
-                  display: 'flex', alignItems: 'center', gap: 16, padding: '14px 18px', borderRadius: 12,
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10,
                   background: pillBg, border: `1px solid ${e > 0.55 ? pal.accent : cardBorder}`,
-                  opacity: e, transform: `translateY(${(1 - e) * 12}px)`,
+                  opacity: e, transform: `translateY(${(1 - e) * 8}px)`,
                 }}>
                   <span style={{
-                    width: 42, height: 42, borderRadius: 10, flexShrink: 0, background: e > 0.55 ? pal.accent : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)'),
-                    color: e > 0.55 ? '#fff' : pal.ink, fontFamily: M, fontSize: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    width: 34, height: 34, borderRadius: 8, flexShrink: 0, background: e > 0.55 ? pal.accent : (pal.dark ? 'rgba(242,239,232,0.1)' : 'rgba(16,18,21,0.07)'),
+                    color: e > 0.55 ? '#fff' : pal.ink, fontFamily: M, fontSize: 12, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                   }}>{r.id}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: F, fontWeight: 600, fontSize: 19, color: pal.ink }}>{r.title}</div>
-                    <div style={{ ...mono, fontSize: 14, opacity: 0.55, marginTop: 3 }}>{r.detail}</div>
+                    <div style={{ fontFamily: F, fontWeight: 600, fontSize: 16, color: pal.ink }}>{r.title}</div>
+                    <div style={{ ...mono, fontSize: 12, opacity: 0.55, marginTop: 2 }}>{r.detail}</div>
                   </div>
                   <Check on={e > 0.65} accent={pal.accent} />
                 </div>
               );
             })}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 24, opacity: done }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, opacity: done, flexShrink: 0 }}>
             <Check on={done > 0.55} accent={pal.accent} />
-            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>12 rules live — investment team unblocked on every NDA</span>
+            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 16, color: pal.ink }}>Playbook live — only outliers go to your legal team</span>
           </div>
         </div>
-        <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.8, 0.06), textAlign: 'center' }}>
-          Your positions. <span style={{ color: pal.accent }}>Encoded once. Applied every time.</span>
+        <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 22, color: pal.ink, opacity: ez(p, 0.76, 0.06), textAlign: 'center', flexShrink: 0 }}>
+          Your positions, encoded once, <span style={{ color: pal.accent }}>applied everytime</span>
         </div>
       </div>
     );
@@ -444,10 +464,11 @@
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
     const soft = pal.dark ? 'rgba(242,239,232,0.08)' : 'rgba(16,18,21,0.06)';
     // 0 hook · 1 customise playbook · 2 three-step flow · 3 redline + issues · 4 payoff
-    const phase = p < 0.09 ? 0 : p < 0.3 ? 1 : p < 0.54 ? 2 : p < 0.82 ? 3 : 4;
+    const TITLE = 0.11;
+    const phase = p < 0.28 ? 0 : p < 0.505 ? 1 : p < 0.685 ? 2 : p < 0.835 ? 3 : 4;
     const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
-    const fp = local(0.3, 0.54);
-    const rp = local(0.54, 0.82);
+    const fp = local(0.505, 0.685);
+    const rp = local(0.685, 0.835);
     const flowIn = ez(fp, 0.04, 0.1);
     const step1 = ez(fp, 0.1, 0.12);
     const step2 = ez(fp, 0.28, 0.12);
@@ -456,13 +477,13 @@
     const step3 = ez(fp, 0.55, 0.12);
     const arrow1 = ez(fp, 0.22, 0.08);
     const arrow2 = ez(fp, 0.48, 0.08);
-    const docIn = ez(rp, 0.04, 0.12);
-    const panelIn = ez(rp, 0.12, 0.12);
-    const strike1 = ez(rp, 0.22, 0.12);
-    const issue1 = ez(rp, 0.24, 0.12);
-    const strike2 = ez(rp, 0.48, 0.12);
-    const issue2 = ez(rp, 0.5, 0.12);
-    const backIn = ez(rp, 0.72, 0.12);
+    const docIn = ez(rp, 0.02, 0.08);
+    const panelIn = ez(rp, 0.08, 0.09);
+    const strike1 = ez(rp, 0.16, 0.09);
+    const issue1 = ez(rp, 0.18, 0.09);
+    const strike2 = ez(rp, 0.36, 0.09);
+    const issue2 = ez(rp, 0.38, 0.09);
+    const backIn = ez(rp, 0.52, 0.08);
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
     const MailIcon = ({ size = 22 }) => (
       <svg width={size} height={size * 0.82} viewBox="0 0 22 18"><rect x="1" y="1" width="20" height="16" rx="2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" /><polyline points="1.5,2.5 11,10 20.5,2.5" fill="none" stroke={pal.ink} strokeWidth="1.6" strokeLinejoin="round" /></svg>
@@ -495,9 +516,11 @@
     );
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
-        {phase === 0 ? <SectionTitle p={p} num="03" text="NDA AUTOMATION" /> : <Kicker p={p} at={0} num="03" text="NDA AUTOMATION" />}
-        {phase === 0 && <HookLines p={p} l1="Another NDA just landed." l2="It's the ninth this week." />}
-        {phase === 1 && <NdaCustomize p={local(0.09, 0.3)} />}
+        {phase === 0 && p < TITLE
+          ? <SectionTitle p={p} num="03" text="NDA AUTOMATION" until={TITLE} />
+          : <Kicker p={p} at={phase === 0 ? TITLE : 0} num="03" text="NDA AUTOMATION" />}
+        {phase === 0 && <HookLines p={p} size={72} l1="What happens when another NDA lands," l2="and it’s the ninth this week." />}
+        {phase === 1 && <NdaCustomize p={local(0.28, 0.505)} />}
         {phase === 2 && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, opacity: flowIn }}>
             <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', gap: 0 }}>
@@ -545,10 +568,10 @@
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 2 }}>
                   {[
                     ['Applies your negotiated positions', true],
-                    ['Redlines — no wait on counsel', true],
-                    ['Returns draft to the fund', true],
+                    ['Auto-redlines inside the playbook', true],
+                    ['Only outliers escalate to your team', true],
                   ].map(([t, on], i) => {
-                    const e = ez(fp, 0.68 + i * 0.06, 0.08);
+                    const e = ez(fp, 0.62 + i * 0.04, 0.06);
                     return (
                       <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: e, transform: `translateY(${(1 - e) * 10}px)` }}>
                         <Check on={on && e > 0.55} accent={pal.accent} />
@@ -557,14 +580,14 @@
                     );
                   })}
                 </div>
-                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, opacity: ez(fp, 0.86, 0.08) }}>
+                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, opacity: ez(fp, 0.74, 0.06) }}>
                   <img src="assets/perry-logo.png" alt="Perry" style={{ height: 18, filter: pal.dark ? 'invert(1)' : 'none' }} />
-                  <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>investment team unblocked</span>
+                  <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>legal team on exceptions only</span>
                 </div>
               </StepCard>
             </div>
-            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(fp, 0.78, 0.08), textAlign: 'center', maxWidth: 1100 }}>
-              Your rules, trained with your team. <span style={{ color: pal.accent }}>No waiting on the lawyer.</span>
+            <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(fp, 0.72, 0.06), textAlign: 'center', maxWidth: 1100 }}>
+              In-playbook NDAs run alone. <span style={{ color: pal.accent }}>Only outliers go to your team.</span>
             </div>
           </div>
         )}
@@ -697,10 +720,10 @@
         )}
         {phase === 4 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.84} size={108} color={pal.ink}>Your playbook.</Slam>
-            <Slam p={p} at={0.855} size={108} color={pal.accent}>Their redline — without the wait.</Slam>
+            <Slam p={p} at={0.85} size={88} color={pal.ink}>Perry knows your playbook.</Slam>
+            <Slam p={p} at={0.865} size={88} color={pal.accent}>Redline without the back and forth.</Slam>
             <div style={{ marginTop: 56 }}>
-              <KpiFlip p={p} at={0.885} label="NDA review" from="30 min" to="7 min" />
+              <KpiFlip p={p} at={0.89} label="NDA review" from="30 min" to="7 min" />
             </div>
           </div>
         )}
@@ -724,26 +747,26 @@
     const graphIn = ez(p, 0.18, 0.08);
     const search = ez(p, 0.38, 0.14);
     const steps = [
-      { label: 'INDEX', detail: 'Embed clauses', at: 0.28 },
-      { label: 'RETRIEVE', detail: 'Vector + graph', at: 0.4 },
+      { label: 'INDEX', detail: 'Store clauses', at: 0.28 },
+      { label: 'PREPARE', detail: 'Vector + graph', at: 0.4 },
       { label: 'RANK', detail: 'RAG rerank', at: 0.52 },
-      { label: 'GROUND', detail: 'Cite sources', at: 0.64 },
+      { label: 'RETRIEVE', detail: 'Cite sources', at: 0.64 },
     ];
     const nodes = [
       { id: 'fund', x: 310, y: 168, r: 46, label: 'Fund\ncorpus', hub: true },
-      { id: 'orange', x: 118, y: 78, r: 34, label: 'Orange' },
-      { id: 'grape', x: 502, y: 72, r: 34, label: 'Grape' },
-      { id: 'mango', x: 96, y: 250, r: 30, label: 'Mango' },
+      { id: 'spa', x: 118, y: 78, r: 34, label: 'SPA' },
+      { id: 'sha', x: 502, y: 72, r: 34, label: 'SHA' },
+      { id: 'sl', x: 96, y: 250, r: 32, label: 'Side\nLetter' },
       { id: 'aoa', x: 520, y: 248, r: 32, label: 'AoA' },
       { id: 'pref', x: 310, y: 310, r: 36, label: 'Liq.\npref', hot: true },
     ];
     const edges = [
-      ['fund', 'orange'], ['fund', 'grape'], ['fund', 'mango'], ['fund', 'aoa'], ['fund', 'pref'],
-      ['orange', 'pref'], ['grape', 'pref'], ['aoa', 'pref'],
+      ['fund', 'spa'], ['fund', 'sha'], ['fund', 'sl'], ['fund', 'aoa'], ['fund', 'pref'],
+      ['spa', 'pref'], ['sha', 'pref'], ['aoa', 'pref'],
     ];
     const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
     const hit = (id) => {
-      const order = { fund: 0, orange: 0.15, grape: 0.22, pref: 0.35, aoa: 0.45, mango: 0.55 };
+      const order = { fund: 0, spa: 0.15, sha: 0.22, pref: 0.35, aoa: 0.45, sl: 0.55 };
       return clamp((search - (order[id] || 0)) / 0.25, 0, 1);
     };
     return (
@@ -848,16 +871,16 @@
               })}
               <div style={{
                 marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px',
-                borderRadius: 12, background: pillBg, opacity: ez(p, 0.72, 0.06),
+                borderRadius: 12, background: pillBg, opacity: ez(p, 0.68, 0.06),
               }}>
-                <Check on={ez(p, 0.72, 0.06) > 0.55} accent={pal.accent} />
+                <Check on={ez(p, 0.68, 0.06) > 0.55} accent={pal.accent} />
                 <span style={{ fontFamily: F, fontWeight: 600, fontSize: 15, color: pal.ink }}>14 docs · 8 clauses retrieved</span>
               </div>
             </div>
           </div>
         </div>
-        <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.78, 0.06), textAlign: 'center' }}>
-          Ask anything — <span style={{ color: pal.accent }}>the corpus answers.</span>
+        <div style={{ fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, opacity: ez(p, 0.72, 0.06), textAlign: 'center' }}>
+          Ask anything — <span style={{ color: pal.accent }}>about anything.</span>
         </div>
       </div>
     );
@@ -871,9 +894,10 @@
     const pillBg = pal.dark ? 'rgba(242,239,232,0.07)' : '#F2F7F5';
     const mono = { fontFamily: M, fontSize: 17, color: pal.ink };
     // 0 hook · 1 knowledge graph / RAG · 2 insights UI · 3 payoff
-    const phase = p < 0.14 ? 0 : p < 0.42 ? 1 : p < 0.78 ? 2 : 3;
+    const TITLE = 0.11;
+    const phase = p < 0.28 ? 0 : p < 0.54 ? 1 : p < 0.78 ? 2 : 3;
     const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
-    const lp = local(0.42, 0.78);
+    const lp = local(0.54, 0.78);
     const cardIn = ez(lp, 0.04, 0.1);
     const qIn = ez(lp, 0.14, 0.1);
     const ansIn = ez(lp, 0.28, 0.12);
@@ -881,9 +905,11 @@
     const fillN = Math.floor(ez(p, 0.82, 0.12) * total);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
-        {phase === 0 ? <SectionTitle p={p} num="01" text="TRENDS & INSIGHT" /> : <Kicker p={p} at={0} num="01" text="TRENDS & INSIGHT" />}
-        {phase === 0 && <HookLines p={p} size={88} l1="You have 45 portfolio companies." l2="What did the legal documents tell you?" />}
-        {phase === 1 && <PatternsBackend p={local(0.14, 0.42)} />}
+        {phase === 0 && p < TITLE
+          ? <SectionTitle p={p} num="01" text="TRENDS & INSIGHT" until={TITLE} />
+          : <Kicker p={p} at={phase === 0 ? TITLE : 0} num="01" text="TRENDS & INSIGHT" />}
+        {phase === 0 && <HookLines p={p} size={72} l1="You have 45 portfolio companies." l2={'But do their legal documents really “tell” you anything?'} />}
+        {phase === 1 && <PatternsBackend p={local(0.28, 0.54)} />}
         {phase === 2 && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 30 }}>
             <div style={{ width: 1160, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, boxShadow: '0 24px 60px rgba(16,18,21,0.10)', padding: '36px 48px 42px', opacity: cardIn, transform: `translateY(${(1 - cardIn) * 40}px) scale(${0.96 + 0.04 * cardIn})` }}>
@@ -929,8 +955,8 @@
         {phase === 3 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div>
-              <Slam p={p} at={0.8} size={108} color={pal.ink}>One document is an answer.</Slam>
-              <Slam p={p} at={0.82} size={108} color={pal.accent}>Two hundred are a strategy.</Slam>
+              <Slam p={p} at={0.8} size={96} color={pal.ink}>One document gives you answers.</Slam>
+              <Slam p={p} at={0.82} size={96} color={pal.accent}>Two hundred gives you a strategy.</Slam>
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols},1fr)`, gap: 10, marginTop: 60, width: 1150 }}>
                 {Array.from({ length: total }, (_, i) => {
                   const on = i < fillN;
@@ -1104,7 +1130,7 @@
     const line1 = ez(p, 0.22, 0.06);
     const line2 = ez(p, 0.32, 0.06);
     const duePulse = ez(p, 0.28, 0.08);
-    const notified = ez(p, 0.55, 0.07);
+    const notified = ez(p, 0.42, 0.07);
     const dueUrgent = duePulse > 0.45;
     return (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1125,11 +1151,10 @@
           <div style={{ ...mono, fontSize: 15, letterSpacing: '0.12em', opacity: 0.5, borderBottom: `1px solid ${cardBorder}`, paddingBottom: 10 }}>ACTIVITY</div>
           <div style={{ display: 'flex', gap: 16, padding: '22px 0 4px', opacity: agentIn, transform: `translateY(${(1 - agentIn) * 14}px)` }}>
             <span style={{
-              width: 42, height: 42, borderRadius: 21, flexShrink: 0, background: pal.dark ? 'rgba(0,156,127,0.2)' : 'rgba(0,156,127,0.12)',
-              border: `1.5px solid ${pal.accent}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-            }}>
-              <img src="assets/perry-logo.png" alt="Perry" style={{ height: 16, filter: pal.dark ? 'invert(1)' : 'none' }} />
-            </span>
+              width: 42, height: 42, borderRadius: 21, flexShrink: 0, background: pal.accent,
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: M, fontSize: 18, fontWeight: 500, color: '#fff',
+            }}>P</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                 <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>Perry AI</span>
@@ -1162,22 +1187,25 @@
     const { progress: p } = useScene();
     const pal = React.useContext(Pal);
     // 0 hook · 1 chat upload+tasks · 2 task list click · 3 Perry deadline reminder · 4 payoff
-    const phase = p < 0.1 ? 0 : p < 0.4 ? 1 : p < 0.55 ? 2 : p < 0.8 ? 3 : 4;
+    const TITLE = 0.11;
+    const phase = p < 0.28 ? 0 : p < 0.505 ? 1 : p < 0.625 ? 2 : p < 0.835 ? 3 : 4;
     const local = (a, b) => clamp((p - a) / (b - a), 0, 1);
     return (
       <div style={{ position: 'absolute', inset: 0, background: pal.paper }}>
-        {phase === 0 ? <SectionTitle p={p} num="04" text="POST-CLOSE TRACKING" /> : <Kicker p={p} at={0} num="04" text="POST-CLOSE TRACKING" />}
+        {phase === 0 && p < TITLE
+          ? <SectionTitle p={p} num="04" text="POST-CLOSE TRACKING" until={TITLE} />
+          : <Kicker p={p} at={phase === 0 ? TITLE : 0} num="04" text="POST-CLOSE TRACKING" />}
         {phase === 0 && <HookLines p={p} size={124} l1="The deal closed." l2="The work didn't." />}
-        {phase === 1 && <TrackChat p={local(0.1, 0.4)} />}
-        {phase === 2 && <TaskList p={local(0.4, 0.55)} />}
-        {phase === 3 && <TaskDetail p={local(0.55, 0.8)} />}
+        {phase === 1 && <TrackChat p={local(0.28, 0.505)} />}
+        {phase === 2 && <TaskList p={local(0.505, 0.625)} />}
+        {phase === 3 && <TaskDetail p={local(0.625, 0.835)} />}
         {phase === 4 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Slam p={p} at={0.82} size={98} color={pal.ink}>Every obligation — an owner,</Slam>
-            <Slam p={p} at={0.835} size={98} color={pal.ink}>a deadline, a paper trail.</Slam>
-            <Slam p={p} at={0.85} size={132} color={pal.accent}>Nothing slips.</Slam>
+            <Slam p={p} at={0.85} size={98} color={pal.ink}>Every obligation — an owner,</Slam>
+            <Slam p={p} at={0.865} size={98} color={pal.ink}>a deadline, a paper trail.</Slam>
+            <Slam p={p} at={0.88} size={132} color={pal.accent}>Nothing slips.</Slam>
             <div style={{ marginTop: 44 }}>
-              <KpiFlip p={p} at={0.875} label="Post-investment follow-up" from="Email chains" to="Shared tracking" />
+              <KpiFlip p={p} at={0.9} label="Post-investment follow-up" from="Email chains" to="Shared tracking" />
             </div>
           </div>
         )}
@@ -1205,14 +1233,14 @@
         {phase === 0 && (
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Slam p={p} at={0.04} size={72} color={pal.ink}>AI generated answers are cheap.</Slam>
-            <Slam p={p} at={0.16} size={72} color={pal.accent}>Fund-grade outcomes are not.</Slam>
+            <Slam p={p} at={0.16} size={72} color={pal.accent}>Fund-level analysis is not.</Slam>
           </div>
         )}
         {phase === 1 && (
           <div style={{ position: 'absolute', inset: 0, padding: '88px 90px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 22 }}>
             <div style={{ opacity: ez(p, 0.36, 0.05) }}>
               <div style={{ fontFamily: T, fontWeight: 600, fontSize: 32, color: pal.ink, lineHeight: 1.2 }}>AI generated answers are cheap.</div>
-              <div style={{ fontFamily: T, fontWeight: 600, fontSize: 32, color: pal.accent, lineHeight: 1.2, marginTop: 4 }}>Fund-grade outcomes are not.</div>
+              <div style={{ fontFamily: T, fontWeight: 600, fontSize: 32, color: pal.accent, lineHeight: 1.2, marginTop: 4 }}>Fund-level analysis is not.</div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, opacity: panelIn, transform: `translateY(${(1 - panelIn) * 24}px)` }}>
               <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 18, padding: '22px 26px 24px', boxShadow: '0 18px 44px rgba(16,18,21,0.06)' }}>
@@ -1245,7 +1273,7 @@
                   <img src="assets/perry-logo.png" alt="Perry" style={{ height: 18, filter: pal.dark ? 'invert(1)' : 'none' }} />
                   <span style={{ fontFamily: M, fontSize: 13, letterSpacing: '0.14em', color: pal.ink, opacity: 0.5 }}>PERRY</span>
                   <span style={{ flex: 1 }} />
-                  <span style={{ fontFamily: M, fontSize: 11, letterSpacing: '0.1em', color: '#fff', background: pal.accent, borderRadius: 999, padding: '4px 10px' }}>FUND-GRADE</span>
+                  <span style={{ fontFamily: M, fontSize: 11, letterSpacing: '0.1em', color: '#fff', background: pal.accent, borderRadius: 999, padding: '4px 10px' }}>FUND-LEVEL</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {rows.map((r, i) => {
@@ -1267,7 +1295,7 @@
             </div>
             <div style={{
               fontFamily: T, fontWeight: 600, fontStyle: 'italic', fontSize: 26, color: pal.ink, textAlign: 'center',
-              opacity: ez(p, 0.84, 0.06), transform: `translateY(${(1 - ez(p, 0.84, 0.06)) * 12}px)`,
+              opacity: ez(p, 0.76, 0.06), transform: `translateY(${(1 - ez(p, 0.76, 0.06)) * 12}px)`,
             }}>
               Perry doesn’t just answer — <span style={{ color: pal.accent }}>it runs the work.</span>
             </div>
@@ -1301,7 +1329,7 @@
     return (
       <Pal.Provider value={pal}>
         <div style={{ position: 'fixed', inset: 0, background: pal.paper }}>
-          <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="./assets/a-little-higher.mp3?v=4" soundtrackDelay={1} soundtrackVolume={1} persistKey="perry-intro-v5">
+          <SceneStage width={1600} height={900} bg={pal.paper} scenes={window.OM_SCENES} playback={window.OM_PLAYBACK} soundtrack="./assets/a-little-higher.mp3?v=11" soundtrackDelay={0} soundtrackVolume={1} persistKey="perry-intro-v5">
             {{ Hook: SHook, Ask: SAsk, NDA: SNda, Patterns: SPatterns, Tracked: STrack, Close: SClose, Perry: SLogo }}
           </SceneStage>
         </div>
