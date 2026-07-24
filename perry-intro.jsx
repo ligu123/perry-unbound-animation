@@ -20,7 +20,6 @@
       }}>
         <span style={{ fontFamily: T, fontWeight: 600, fontSize: 34, color: pal.accent, letterSpacing: '0.02em' }}>{num}</span>
         <span style={{ fontSize: 22, opacity: 0.85 }}>{text}</span>
-        <span style={{ width: 36, height: 3, background: pal.accent, borderRadius: 2, opacity: 0.9 }} />
       </div>
     );
   }
@@ -136,9 +135,9 @@
     const outIn = ez(p, 0.76, 0.06);
     const docs = [
       { at: 0.22, kind: 'SIDE LETTER', name: 'Alpha Capital — Side Letter', clause: 'Excluded jurisdictions · ASEAN', hit: true, excerpt: '…shall not be required to participate in investments in the Philippines…' },
-      { at: 0.34, kind: 'SIDE LETTER', name: 'Meridian LP — Side Letter', clause: 'Investment restrictions', hit: false, excerpt: 'No Philippines exclusion · cleared' },
+      { at: 0.34, kind: 'SIDE LETTER', name: 'Meridian LP — Side Letter', clause: 'Geographic carve-outs', hit: true, excerpt: '…excused from any investment in the Philippines…' },
       { at: 0.46, kind: 'SIDE LETTER', name: 'Northwind Partners — Side Letter', clause: 'Geographic carve-outs', hit: true, excerpt: '…opt-out for Philippines and Indonesia…' },
-      { at: 0.58, kind: 'LPA', name: 'Fund LPA — Sch. 3', clause: 'Investment Restrictions', hit: true, excerpt: 'Schedule lists restricted jurisdictions; LP side letters may add further exclusions.' },
+      { at: 0.58, kind: 'LPA', name: 'Fund LPA — Sch. 3', clause: 'Investment Restrictions', hit: false, excerpt: 'Base restricted list · LP side letters may add further exclusions' },
       { at: 0.7, kind: 'LPA', name: 'Fund LPA — cl. 8.4', clause: 'Excuse rights', hit: false, excerpt: 'Excuse mechanics referenced · no Philippines default' },
     ];
     return (
@@ -217,7 +216,7 @@
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 14, opacity: outIn, transform: `translateY(${(1 - outIn) * 12}px)`, flexShrink: 0 }}>
             <Check on={outIn > 0.55} accent={pal.accent} />
-            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>2 LP exclusions found · 3 docs clear</span>
+            <span style={{ fontFamily: F, fontWeight: 600, fontSize: 18, color: pal.ink }}>3 LP exclusions found · 2 docs clear</span>
             <span style={{ ...mono, fontSize: 13, opacity: 0.5 }}>→ composing cited answer</span>
           </div>
         </div>
@@ -274,20 +273,20 @@
               <div style={{ opacity: reveal, transform: `translateY(${(1 - reveal) * 16}px)` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 6px', fontFamily: M, fontSize: 17, color: pal.ink, opacity: 0.55 }}>
                   <span style={{ width: 13, height: 16, border: `1.5px solid ${pal.ink}`, borderRadius: 3, display: 'inline-block' }} />
-                  Searched side letters + LPA · 5 documents · 2 exclusions
+                  Searched side letters + LPA · 5 documents · 3 exclusions
                 </div>
-                <div style={{ ...body, margin: '14px 0 4px' }}>Yes — <strong>two LPs</strong> have Philippines exclusions in their side letters:</div>
+                <div style={{ ...body, margin: '14px 0 4px' }}>Yes — <strong>three LPs</strong> have Philippines exclusions in their side letters:</div>
                 <div style={h2}>Alpha Capital — Side Letter</div>
                 <div style={body}>
                   Alpha is not required to participate in investments in the <strong>Philippines</strong>. The carve-out sits in the excluded-jurisdictions schedule.{badge('1', hover, badgeRef)}
                 </div>
+                <div style={h2}>Meridian LP — Side Letter</div>
+                <div style={body}>
+                  Meridian is excused from any investment in the <strong>Philippines</strong> under its geographic carve-outs.{badge('2', false, null)}
+                </div>
                 <div style={h2}>Northwind Partners — Side Letter</div>
                 <div style={body}>
-                  Northwind holds an opt-out for <strong>Philippines and Indonesia</strong> under geographic investment restrictions.{badge('2', false, null)}
-                </div>
-                <div style={h2}>Fund LPA — Schedule 3</div>
-                <div style={body}>
-                  The LPA allows LP side letters to add jurisdiction exclusions on top of the fund’s base restricted list; Meridian’s side letter is clear of a Philippines carve-out.{badge('3', false, null)}
+                  Northwind holds an opt-out for <strong>Philippines and Indonesia</strong> under geographic investment restrictions.{badge('3', false, null)}
                 </div>
               </div>
               <div style={{ position: 'absolute', left: Math.max(0, bp.x - 450), top: bp.y + 22, width: 440, background: cardBg, border: `1px solid ${cardBorder}`, borderLeft: `3px solid ${pal.accent}`, borderRadius: 12, boxShadow: '0 16px 40px rgba(16,18,21,0.18)', padding: '20px 24px', opacity: popVis, transform: `translateY(${(1 - popVis) * 10}px)`, zIndex: 20 }}>
@@ -317,7 +316,7 @@
         {phase === 0 && p < TITLE
           ? <SectionTitle p={p} num="02" text="ASK ANYTHING" until={TITLE} />
           : <Kicker p={p} at={phase === 0 ? TITLE : 0.02} num="02" text="ASK ANYTHING" />}
-        {phase === 0 && p >= TITLE - 0.02 && <Quote p={p} at={0.14} words={QUOTE} pre="Investment committee, before the next close —" />}
+        {phase === 0 && p >= TITLE - 0.02 && <Quote p={p} at={0.14} words={QUOTE} />}
         {phase === 1 && <AskAgentWork p={local(0.347, 0.587)} />}
         {phase === 2 && <AnswerDoc p={local(0.587, 0.78)} pal={pal} />}
         {phase === 3 && (
@@ -956,7 +955,7 @@
           <div style={{ position: 'absolute', inset: 0, padding: '0 110px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div>
               <Slam p={p} at={0.8} size={96} color={pal.ink}>One document gives you answers.</Slam>
-              <Slam p={p} at={0.82} size={96} color={pal.accent}>Two hundred gives you a strategy.</Slam>
+              <Slam p={p} at={0.82} size={96} color={pal.accent}>Two hundred give you a strategy.</Slam>
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols},1fr)`, gap: 10, marginTop: 60, width: 1150 }}>
                 {Array.from({ length: total }, (_, i) => {
                   const on = i < fillN;

@@ -1,0 +1,13 @@
+{
+  "name": "perry-unbound-animation",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "export:mp4": "node scripts/export-mp4.mjs"
+  },
+  "devDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "playwright": "^1.52.0"
+  }
+}
